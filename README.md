@@ -9,13 +9,20 @@ A web app that keeps a person's health history, estimates diabetes and heart dis
 |---|---|---|
 | 1 | Structure, database schema, API contract | Done (`docs/PHASE1.md`, `backend/schema.sql`) |
 | 2 | ML training, evaluation, calibration, SHAP, Trust Meter inputs, model cards | Diabetes done; heart model needs `ml/data/raw/processed.cleveland.data` (see `ml/README.md`) |
-| 3 | FastAPI backend | Not started |
+| 3 | FastAPI backend (auth, measurements, predictions, scenarios, Goal Planner, privacy) | Done: 61 tests, see `backend/README.md`. Heart endpoints return 503 until the heart model is trained. |
 | 4-7 | Frontend, simulator, ingestion, privacy, deployment | Not started |
 
 ## Layout
-`frontend/` React + TypeScript (planned) · `backend/` FastAPI (planned) · `ml/` training, evaluation, inference (working) · `docs/` design and API contract · `e2e/` · `scripts/`
+`frontend/` React + TypeScript (planned) · `backend/` FastAPI (working) · `ml/` training, evaluation, inference (working) · `docs/` design and API contract · `e2e/` · `scripts/`
 
-## Try the ML part
+## Try it
+```bash
+cd backend && pip install -r requirements.txt
+uvicorn app.main:create_app --factory --reload   # API docs at /docs
+python -m pytest -q
+```
+
+## ML part
 ```bash
 cd ml && pip install -r requirements.txt
 python -m src.train --condition diabetes

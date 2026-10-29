@@ -84,6 +84,8 @@ CREATE TABLE predictions (
     risk_band       TEXT NOT NULL CHECK (risk_band IN ('low','moderate','high')),
     explanation     JSONB,                  -- SHAP values for this input
     trust           JSONB,                  -- Trust Meter: model agreement (LR vs RF), uncertainty range, out_of_distribution features
+    limitations     JSONB,                  -- limitation strings shown with this estimate, frozen at prediction time
+    is_hypothetical BOOLEAN NOT NULL DEFAULT false,  -- true for what-if / goal-plan runs; excluded from prediction history
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_predictions_user_time ON predictions (user_id, created_at DESC);
@@ -144,3 +146,15 @@ CREATE TABLE explainer_messages (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_explainer_user_time ON explainer_messages (user_id, created_at DESC);
+
+-- Rotating refresh tokens. Only a hash is stored. Re-use of a revoked token revokes the whole family.
+CREATE TABLE refresh_tokens (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    family_id       UUID NOT NULL,
+    token_hash      TEXT NOT NULL UNIQUE,
+    expires_at      TIMESTAMPTZ NOT NULL,
+    revoked_at      TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_refresh_family ON refresh_tokens (family_id);

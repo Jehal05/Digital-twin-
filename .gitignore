@@ -3,3 +3,7 @@ __pycache__/
 .pytest_cache/
 node_modules/
 .env
+*.db
+*.sqlite3
+backend/.env
+ml/.env

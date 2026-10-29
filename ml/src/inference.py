@@ -116,6 +116,21 @@ class HealthTwinModel:
                              "the estimate simply by being below that dataset average; it does not mean the value is protective.",
                 "note": "Describes how this model's output depends on each input. It does not show medical causation."}
 
+    def limitations(self) -> list[str]:
+        return [
+            "Experimental model estimate, not a diagnosis.",
+            self.b["schema"]["population_note"],
+            f"Outcome in the training data: {self.b['schema']['outcome_definition']}",
+            "Trained on a small public dataset that has not been clinically validated.",
+        ]
+
+    def score_batch(self, rows: pd.DataFrame) -> np.ndarray:
+        """Score many already-validated rows at once with the real primary model (used by the Goal Planner)."""
+        return self.b["models"][self.primary].predict_proba(rows[self.features])[:, 1]
+
+    def editable_features(self) -> list[str]:
+        return [n for n, s in self.schema.items() if s["editable"]]
+
     def predict(self, inputs: dict, explain: bool = True) -> dict:
         X = self.validate(inputs)
         p = float(self.b["models"][self.primary].predict_proba(X)[0, 1])
@@ -127,12 +142,7 @@ class HealthTwinModel:
             "model": {"version": self.version, "algorithm": self.primary},
             "input_snapshot": {k: float(v) for k, v in X.iloc[0].items()},
             "trust": self._trust(X, p),
-            "limitations": [
-                "Experimental model estimate, not a diagnosis.",
-                self.b["schema"]["population_note"],
-                f"Outcome in the training data: {self.b['schema']['outcome_definition']}",
-                "Trained on a small public dataset that has not been clinically validated.",
-            ],
+            "limitations": self.limitations(),
         }
         if explain:
             out["explanation"] = self._explain(X)

@@ -180,3 +180,8 @@ Context is limited to the caller's own records plus approved reference text. Out
 - **Heart model uses 10 inputs:** age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak (no slope, ca, thal). Editable in What-If: trestbps and chol only.
 - Source of truth for ranges, units, editable flags and categories is `ml/src/config.py`; the backend and UI should read the exported `feature_schema.json`, not copy values from this document.
 - Predictions carry the dataset's label definition (diabetes diagnosis in Pima; angiographic disease in Cleveland), not "future risk".
+
+## 8. Phase 3 status (backend)
+Implemented: auth (register, login, refresh with rotation, logout), profile, preferences, measurements (+ flagged / resolve), diabetes and heart-disease predictions, prediction history / detail / trust, scenarios (create, list, get, delete), `POST /scenarios/goal-plan`, `GET /cohort/percentile`, `GET /dashboard`, `GET /models/evaluation`, `GET /privacy/export`, `DELETE /privacy/account`.
+Not yet implemented (later phases): uploads and confirm, `/trends/projection`, `/streaks`, `/reports/doctor-visit`, share links, explanations (AI explainer), measurement import from wearables.
+Deviations from section 4: `POST /scenarios/goal-plan` replaces nothing but adds `409 stale_baseline`; the trust data is returned inside each prediction and also at `GET /predictions/{id}/trust`; `/predictions/history` replaces the Time Machine route and excludes hypothetical runs.
