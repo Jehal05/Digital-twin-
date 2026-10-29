@@ -1,3 +1,4 @@
+import { featureLabel, featureValue } from "../lib/format";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { api } from "../api/client";
@@ -10,7 +11,6 @@ import { CardTitle, Glass } from "../components/ui/Glass";
 import { EmptyState, ErrorState, Skeleton } from "../components/ui/States";
 import { Button } from "../components/ui/Button";
 
-const SHORT: Record<string, string> = { glucose: "Glucose", bmi: "BMI", blood_pressure: "Diastolic BP", age: "Age", pregnancies: "Pregnancies" };
 const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: ["age", "trestbps", "chol", "thalach", "oldpeak"] };
 
 function Cohort({ condition, snapshot }: { condition: Condition; snapshot: Record<string, number> }) {
@@ -68,7 +68,7 @@ export function RiskDetailPage() {
   const base = p.explanation?.base_value ?? 0;
   const sum = drivers.reduce((a, d) => a + d.effect, 0);
   const residual = p.score - base - sum;
-  const items = [...drivers.map((d) => ({ label: `${SHORT[d.feature] ?? d.label} ${d.value}`, value: d.effect })), ...(Math.abs(residual) >= 0.005 ? [{ label: "Other / rounding", value: residual }] : [])];
+  const items = [...drivers.map((d) => ({ label: `${featureLabel(d.feature, d.label)}: ${featureValue(d.feature, d.value)}`, value: d.effect })), ...(Math.abs(residual) >= 0.005 ? [{ label: "Other / rounding", value: residual }] : [])];
   return (
     <div aria-busy={loading}>
       {tabs}

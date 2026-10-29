@@ -29,3 +29,23 @@ export function timeAgo(iso: string, now = Date.now()): string {
   return new Date(iso).toLocaleDateString();
 }
 export const shortDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+
+/** Plain-language names and category words for model inputs, so people never see raw codes such as "Sex 0". */
+const FEATURE_LABEL: Record<string, string> = {
+  glucose: "2-hour glucose", bmi: "Body mass index", blood_pressure: "Diastolic blood pressure", age: "Age", pregnancies: "Pregnancies",
+  sex: "Sex", cp: "Chest pain type", trestbps: "Resting systolic blood pressure", chol: "Serum cholesterol", fbs: "Fasting blood sugar above 120",
+  restecg: "Resting ECG", thalach: "Max heart rate in stress test", exang: "Exercise-induced chest pain", oldpeak: "ST depression in stress test",
+};
+const CATEGORY_WORDS: Record<string, Record<number, string>> = {
+  sex: { 1: "Male", 0: "Female" },
+  cp: { 1: "Typical angina", 2: "Atypical angina", 3: "Non-anginal pain", 4: "No chest pain (asymptomatic)" },
+  fbs: { 0: "No", 1: "Yes" },
+  restecg: { 0: "Normal", 1: "ST-T wave abnormality", 2: "Left ventricular hypertrophy" },
+  exang: { 0: "No", 1: "Yes" },
+};
+export const featureLabel = (feature: string, fallback = feature) => FEATURE_LABEL[feature] ?? fallback;
+export function featureValue(feature: string, value: number, unit = ""): string {
+  const word = CATEGORY_WORDS[feature]?.[value];
+  return word ?? `${value}${unit ? " " + unit : ""}`;
+}
+export const isCategorical = (feature: string) => feature in CATEGORY_WORDS;

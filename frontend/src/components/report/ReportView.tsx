@@ -1,5 +1,5 @@
 import type { Report } from "../../api/types";
-import { BAND_CHIP, BAND_LABEL, MEASUREMENT_LABEL, pct, points, shortDate } from "../../lib/format";
+import { BAND_CHIP, BAND_LABEL, MEASUREMENT_LABEL, featureLabel, pct, points, shortDate } from "../../lib/format";
 import { ContentTag } from "../ui/ContentTag";
 import { CardTitle, Glass } from "../ui/Glass";
 
@@ -32,7 +32,7 @@ export function ReportView({ r }: { r: Report }) {
                 <span className="text-xs text-muted">{shortDate(e.created_at)}</span></div>
                 {e.model_range.low !== undefined && e.model_range.high !== undefined && <p className="num mt-1 text-sm">Model range {pct(e.model_range.low)} to {pct(e.model_range.high)} (variability, not a confidence interval)</p>}
                 <p className="mt-1 text-xs text-muted">Inputs: {Object.entries(e.inputs).map(([k, v]) => `${k} ${v}`).join(" · ")}</p>
-                {e.top_drivers.length > 0 && <p className="mt-1 text-sm">Main influences: {e.top_drivers.map((d) => `${d.label} (${d.direction} ${points(d.effect)})`).join("; ")}</p>}
+                {e.top_drivers.length > 0 && <p className="mt-1 text-sm">Main influences: {e.top_drivers.map((d) => `${(d.feature ? featureLabel(d.feature, d.label) : d.label)} (${d.direction} ${points(d.effect)})`).join("; ")}</p>}
                 <p className="mt-2 text-xs text-muted">{e.limitations.slice(0, 2).join(" ")}</p></li>))}</ul>)}
           <p className="mt-3 text-sm font-medium">Experimental model estimate, not a diagnosis.</p></Glass>)}
     </div>

@@ -71,7 +71,7 @@ export interface LabPreview { method: "ocr" | "pdf_text"; ocr_confidence: number
 export interface CommitResult { created: number; skipped_duplicates: number; flagged: number; errors: { index: number; message: string }[] }
 export interface ReportMeasurement { measurement_type: string; unit: string; count: number; first: number; latest: number; min: number; max: number; latest_at: string; sources: string[] }
 export interface ReportEstimate { condition: Condition; score: number; risk_band: RiskBand; created_at: string; inputs: Record<string, number>;
-  model_range: { low?: number; high?: number }; top_drivers: { label: string; effect: number; direction: "raises" | "lowers" }[]; limitations: string[] }
+  model_range: { low?: number; high?: number }; top_drivers: { feature?: string; label: string; effect: number; direction: "raises" | "lowers" }[]; limitations: string[] }
 export interface Report { generated_at: string; disclaimer: string; sections: string[]; shared?: boolean; expires_at?: string;
   profile?: { age: number | null; sex: string | null; height_cm: number | null }; measurements?: ReportMeasurement[]; measurement_window_days?: number;
   estimates?: ReportEstimate[]; scenario_count?: number }

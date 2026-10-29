@@ -99,3 +99,23 @@ def test_unknown_baseline_is_404(user):
     r = user.post("/scenarios", {"name": "x", "condition": "diabetes", "baseline_prediction_id": str(uuid.uuid4()),
                                  "changed_inputs": {"bmi": 25}})
     assert r.status_code == 404
+
+
+def test_heart_what_if_and_goal_plan_use_the_real_heart_model(user):
+    heart = {"age": 58, "sex": 1, "cp": 4, "trestbps": 160, "chol": 300, "fbs": 0, "restecg": 0,
+             "thalach": 130, "exang": 0, "oldpeak": 1.0}
+    base = user.post("/predictions/heart-disease", {"features": heart}).json()
+    r = user.post("/scenarios", {"name": "lower bp", "condition": "heart_disease", "baseline_prediction_id": base["id"],
+                                 "changed_inputs": {"trestbps": 120}})
+    assert r.status_code == 201, r.text
+    s = r.json()
+    assert s["content_kind"] == "hypothetical" and s["scenario"]["input_snapshot"]["trestbps"] == 120.0
+    assert s["scenario"]["input_snapshot"]["age"] == 58.0 and s["scenario"]["score"] != base["score"]
+    # fixed (non-editable) inputs cannot be simulated
+    bad = user.post("/scenarios", {"name": "x", "condition": "heart_disease", "baseline_prediction_id": base["id"],
+                                   "changed_inputs": {"sex": 0}})
+    assert bad.status_code == 422
+    g = user.post("/scenarios/goal-plan", {"condition": "heart_disease", "baseline_prediction_id": base["id"],
+                                           "target_score": max(0.05, base["score"] - 0.05)})
+    assert g.status_code in (200, 201), g.text
+    assert set(g.json()["changes"]) <= {"trestbps", "chol"}

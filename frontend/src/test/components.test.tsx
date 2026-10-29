@@ -118,3 +118,18 @@ describe("EstimateForm for heart disease", () => {
     expect(f).not.toHaveBeenCalled();
   });
 });
+
+describe("friendly labels", () => {
+  it("shows words, not codes, for categorical drivers", async () => {
+    const { WhyRisk } = await import("../components/dashboard/WhyRisk");
+    const p = { ...prediction, condition: "heart_disease" as const, explanation: { ...prediction.explanation!, top_drivers: [
+      { feature: "sex", label: "Sex (1 = male, 0 = female)", value: 0, unit: "", effect: -0.19, direction: "lowers" as const },
+      { feature: "cp", label: "Chest pain type (1 typical angina, 2 atypical, 3 non-anginal, 4 asymptomatic)", value: 4, unit: "", effect: 0.13, direction: "raises" as const },
+      { feature: "thalach", label: "Maximum heart rate achieved in stress test", value: 120, unit: "bpm", effect: 0.1, direction: "raises" as const }] } };
+    render(<WhyRisk p={p} />);
+    expect(screen.getByText("Female")).toBeInTheDocument();
+    expect(screen.getByText("No chest pain (asymptomatic)")).toBeInTheDocument();
+    expect(screen.queryByText(/1 = male/)).toBeNull();
+    expect(screen.getByText("120")).toBeInTheDocument();
+  });
+});

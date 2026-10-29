@@ -67,3 +67,27 @@ describe("SimulatorPage", () => {
     expect(calls.some((c) => c.init?.method === "PUT")).toBe(false);
   });
 });
+
+describe("SimulatorPage for heart disease", () => {
+  it("switches to heart, offers only blood pressure and cholesterol, and sends the heart condition", async () => {
+    session.access = "t";
+    const heart = { ...prediction, id: "h1", condition: "heart_disease" as const, score: 0.6, input_snapshot: { age: 58, sex: 1, cp: 4, trestbps: 150, chol: 260, fbs: 0, restecg: 0, thalach: 120, exang: 1, oldpeak: 2 } };
+    const calls: { url: string; init?: RequestInit }[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      calls.push({ url, init });
+      if (url.endsWith("/dashboard")) return json(dashboard({ models_available: ["diabetes", "heart_disease"], latest_predictions: { diabetes: prediction, heart_disease: heart } }));
+      if (url.includes("/scenarios?")) return json({ items: [] });
+      if (url.endsWith("/scenarios") && init?.method === "POST") return json({ id: "s", content_kind: "hypothetical", kind: "what_if", name: "x", condition: "heart_disease", target_score: null, changed_inputs: { trestbps: 130 }, baseline: heart, scenario: { ...heart, id: "h2", score: 0.5 }, delta_pp: -10, note: "n", created_at: "" }, 201);
+      return json({}, 404);
+    }));
+    render(<MemoryRouter><DashboardProvider><SimulatorPage /></DashboardProvider></MemoryRouter>);
+    await userEvent.click(await screen.findByRole("button", { name: "Heart disease" }));
+    await waitFor(() => expect(screen.getAllByRole("slider").map((s) => s.id).filter((i) => i.startsWith("sl-")).sort()).toEqual(["sl-chol", "sl-trestbps"]));
+    expect(screen.getByText("Male")).toBeInTheDocument(); // fixed input shown in words
+    fireEvent.change(document.getElementById("sl-trestbps")!, { target: { value: "130" } });
+    await userEvent.click(screen.getByRole("button", { name: /run scenario/i }));
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/scenarios") && c.init?.method === "POST")).toBe(true));
+    const post = calls.find((c) => c.url.endsWith("/scenarios") && c.init?.method === "POST")!;
+    expect(JSON.parse(post.init!.body as string)).toMatchObject({ condition: "heart_disease", baseline_prediction_id: "h1", changed_inputs: { trestbps: 130 } });
+  });
+});

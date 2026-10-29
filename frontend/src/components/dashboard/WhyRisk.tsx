@@ -1,5 +1,5 @@
 import type { Prediction } from "../../api/types";
-import { points } from "../../lib/format";
+import { featureLabel, featureValue, isCategorical, points } from "../../lib/format";
 import { CardTitle, Glass } from "../ui/Glass";
 import { ContentTag } from "../ui/ContentTag";
 
@@ -17,8 +17,9 @@ export function WhyRisk({ p }: { p: Prediction }) {
             <li key={d.feature} className="panel-dim p-3">
               <div className="flex items-baseline justify-between gap-3">
                 <div>
-                  <p className="text-xs text-muted">{d.label}</p>
-                  <p className="num text-2xl font-semibold">{d.value}<span className="ml-1 text-sm font-normal text-muted">{d.unit}</span></p>
+                  <p className="text-xs text-muted">{featureLabel(d.feature, d.label)}</p>
+                  {isCategorical(d.feature) ? <p className="text-xl font-semibold">{featureValue(d.feature, d.value)}</p>
+                    : <p className="num text-2xl font-semibold">{d.value}<span className="ml-1 text-sm font-normal text-muted">{d.unit}</span></p>}
                 </div>
                 <span className={`num rounded-full px-2.5 py-0.5 text-xs font-semibold ${d.direction === "raises" ? "bg-high-bg text-high" : "bg-low-bg text-low"}`}>
                   {d.direction === "raises" ? "▲" : "▼"} {points(d.effect)}

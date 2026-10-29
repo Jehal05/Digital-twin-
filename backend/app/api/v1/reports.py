@@ -56,7 +56,7 @@ def build_report(db: Session, user: User, include: set[str], registry) -> dict:
                     t = r.trust or {}
                     est.append({"condition": c, "score": r.score, "risk_band": r.risk_band, "created_at": iso(r.created_at),
                                 "inputs": r.input_snapshot, "model_range": (t.get("uncertainty_range") or {}),
-                                "top_drivers": [{"label": d["label"], "effect": d["effect"], "direction": d["direction"]}
+                                "top_drivers": [{"feature": d["feature"], "label": d["label"], "effect": d["effect"], "direction": d["direction"]}
                                                 for d in (r.explanation or {}).get("top_drivers", [])[:3]],
                                 "limitations": r.limitations or [], "content_kind": "ai_estimate"})
                     break
