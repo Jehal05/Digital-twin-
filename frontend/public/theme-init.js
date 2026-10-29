@@ -1,0 +1,2 @@
+/* Applies the saved theme and language before first paint to avoid a flash. Kept as a file so a strict Content-Security-Policy can forbid inline scripts. */
+try{var p=JSON.parse(localStorage.getItem("ht_prefs")||"{}");var d=p.theme==="dark"||((!p.theme||p.theme==="system")&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=d?"dark":"light";if(p.locale)document.documentElement.lang=p.locale}catch(e){}

@@ -13,7 +13,7 @@ from app.models.tables import HealthMeasurement, HealthProfile, User
 
 # model feature -> measurement type it can be read from
 MEASURED = {
-    "diabetes": {"glucose": "glucose_mgdl", "blood_pressure": "bp_diastolic", "bmi": "bmi"},
+    "diabetes": {"glucose": "glucose_2h_mgdl", "blood_pressure": "bp_diastolic", "bmi": "bmi"},
     "heart_disease": {"trestbps": "bp_systolic", "chol": "cholesterol_mgdl", "thalach": "heart_rate_max"},
 }
 
@@ -65,5 +65,6 @@ def assemble_inputs(db: Session, user: User, condition: str, explicit: dict, use
                     inputs[feature], sources[feature] = m.value, f"measured {m.recorded_at.date()}"
     for k, v in (explicit or {}).items():
         inputs[k], sources[k] = v, "provided in request"
-    missing = {f: "not available: add a measurement or provide it in 'features'" for f in feature_names if f not in inputs}
+    hints = {"glucose": "needs a 2-hour glucose tolerance test value; a fasting or random glucose reading is a different measurement and is not used"}
+    missing = {f: hints.get(f, "not available: add a measurement or provide it in 'features'") for f in feature_names if f not in inputs}
     return inputs, sources, missing

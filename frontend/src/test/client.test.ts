@@ -48,4 +48,12 @@ describe("api client", () => {
     await expect(api.get("/dashboard")).rejects.toMatchObject({ status: 401 });
     expect(expired).toHaveBeenCalled(); expect(session.refresh).toBeNull();
   });
+
+  it("keeps the saved session when refresh fails for a temporary reason", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => url.endsWith("/auth/refresh")
+      ? json({ error: { code: "rate_limited", message: "slow down", fields: {} } }, 429)
+      : json({ error: { code: "unauthorized", message: "no", fields: {} } }, 401)));
+    await expect(api.get("/dashboard")).rejects.toMatchObject({ status: 401 });
+    expect(session.refresh).toBe("r1");
+  });
 });

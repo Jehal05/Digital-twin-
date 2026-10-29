@@ -11,7 +11,7 @@ export function Sparkline({ points, label }: { points: TrendPoint[]; label: stri
   const xy = vs.map((v, i) => `${(i / (vs.length - 1)) * 76 + 2},${22 - ((v - lo) / span) * 18}`).join(" ");
   return (
     <svg role="img" aria-label={`${label}: ${vs.length} readings from ${vs[0]} to ${vs[vs.length - 1]}`} width="80" height="26" viewBox="0 0 80 26">
-      <polyline points={xy} fill="none" stroke="#2a58c8" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+      <polyline points={xy} fill="none" stroke="var(--color-brand)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   );
 }

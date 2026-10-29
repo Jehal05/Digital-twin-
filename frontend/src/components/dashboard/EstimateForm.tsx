@@ -20,7 +20,7 @@ export function prefill(data: DashboardData | null): { values: Record<string, st
   if (!data) return { values, sources };
   const m = data.latest_measurements;
   const take = (field: string, v: number | undefined, src: string) => { if (v !== undefined) { values[field] = String(v); sources[field] = src; } };
-  if (m.glucose_mgdl) take("glucose", m.glucose_mgdl.value, `from your ${shortDate(m.glucose_mgdl.recorded_at)} measurement`);
+  if (m.glucose_2h_mgdl) take("glucose", m.glucose_2h_mgdl.value, `from your ${shortDate(m.glucose_2h_mgdl.recorded_at)} 2-hour test`);
   if (m.bp_diastolic) take("blood_pressure", m.bp_diastolic.value, `from your ${shortDate(m.bp_diastolic.recorded_at)} measurement`);
   if (m.bmi) take("bmi", m.bmi.value, `from your ${shortDate(m.bmi.recorded_at)} measurement`);
   else if (data.profile.bmi) take("bmi", data.profile.bmi.value, data.profile.bmi.source);
@@ -60,6 +60,10 @@ export function EstimateForm({ data, onDone, onCancel }: { data: DashboardData |
       <p className="rounded-xl bg-brand-soft p-3 text-sm">
         This model was trained on women aged 21 to 81 of Pima Indian heritage. If that isn't you, treat the result as a demonstration of how the model reacts to numbers, not as information about you.
       </p>
+      {data?.latest_measurements.glucose_mgdl && !data.latest_measurements.glucose_2h_mgdl && (
+        <p className="rounded-xl bg-moderate-bg p-3 text-sm text-moderate" role="note">
+          You have a fasting or random glucose reading, but this model needs a 2-hour glucose tolerance test value, so your reading was not used. Enter a 2-hour value if you have one.
+        </p>)}
       <div className="grid gap-4 sm:grid-cols-2">
         {DIABETES_FIELDS.map((f) => (
           <Field key={f.name} label={`${f.label}${f.unit ? ` (${f.unit})` : ""}`} type="number" inputMode="decimal" step={f.step} min={f.min} max={f.max}

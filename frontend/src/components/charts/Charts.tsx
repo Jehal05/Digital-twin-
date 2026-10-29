@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-const INK = "#10203f", GRID = "#c9d5ee", BRAND = "#2a58c8";
+const INK = "var(--color-ink)", GRID = "var(--color-line)", BRAND = "var(--color-brand)";
 const W = 480, H = 220, M = { l: 44, r: 14, t: 12, b: 30 };
 const scale = (v: number, a: number, b: number, c: number, d: number) => (b === a ? (c + d) / 2 : c + ((v - a) / (b - a)) * (d - c));
 const nice = (n: number) => (n === 0 ? "0" : Math.abs(n) >= 10 ? n.toFixed(0) : n.toFixed(Math.abs(n) < 1 ? 2 : 1));
@@ -26,12 +26,12 @@ export function LineChart({ points, xLabel, yLabel, title, xFmt = nice, diagonal
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={`${id}-t`} className="w-full">
         <title id={`${id}-t`}>{`${title}. ${points.length} points; y from ${nice(Math.min(...ys))} to ${nice(Math.max(...ys))}.`}</title>
         {ticks.map((t) => (<g key={t}><line x1={M.l} x2={W - M.r} y1={Y(t)} y2={Y(t)} stroke={GRID} strokeDasharray="3 4" />
-          <text x={M.l - 6} y={Y(t) + 4} textAnchor="end" fontSize="10.5" fill="#44536f" className="num">{nice(t)}</text></g>))}
-        {xt.map((t, i) => <text key={i} x={X(t)} y={H - 12} textAnchor={i === 0 ? "start" : i === xt.length - 1 ? "end" : "middle"} fontSize="10.5" fill="#44536f" className="num">{xFmt(t)}</text>)}
+          <text x={M.l - 6} y={Y(t) + 4} textAnchor="end" fontSize="10.5" fill="var(--color-ink-muted)" className="num">{nice(t)}</text></g>))}
+        {xt.map((t, i) => <text key={i} x={X(t)} y={H - 12} textAnchor={i === 0 ? "start" : i === xt.length - 1 ? "end" : "middle"} fontSize="10.5" fill="var(--color-ink-muted)" className="num">{xFmt(t)}</text>)}
         {diagonal && <line x1={X(0)} y1={Y(0)} x2={X(1)} y2={Y(1)} stroke="#8a97b3" strokeDasharray="5 4" />}
         <polyline fill="none" stroke={BRAND} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" strokeDasharray={hatched ? "6 4" : undefined}
           points={points.map((p) => `${X(p.x)},${Y(p.y)}`).join(" ")} />
-        {points.length <= 40 && points.map((p, i) => <circle key={i} cx={X(p.x)} cy={Y(p.y)} r="3.5" fill="#fff" stroke={BRAND} strokeWidth="2" />)}
+        {points.length <= 40 && points.map((p, i) => <circle key={i} cx={X(p.x)} cy={Y(p.y)} r="3.5" fill="var(--color-card)" stroke={BRAND} strokeWidth="2" />)}
         <text x={W / 2} y={H - 1} textAnchor="middle" fontSize="10.5" fill={INK}>{xLabel}</text>
         <text transform={`rotate(-90 11 ${H / 2})`} x="11" y={H / 2} textAnchor="middle" fontSize="10.5" fill={INK}>{yLabel}</text>
       </svg>

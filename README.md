@@ -1,34 +1,46 @@
 # HealthTwin: AI-Powered Personal Health Risk Simulator
 
-A web app that keeps a person's health history, estimates diabetes and heart disease risk with trained ML models, explains why (SHAP), and lets users explore hypothetical changes in a What-If Simulator.
+Keep your health history in one place, get a diabetes risk estimate from a trained model, see why (SHAP), and explore "what if" changes.
 
-> **Experimental model estimates, not diagnoses.** Built on small public datasets that have not been clinically validated. Not a medical device.
+> **Experimental model estimates, not diagnoses.** Built on small public datasets, not clinically validated. Not a medical device. In an emergency call your local number (112 in India).
+
+## Honesty principles
+- Every risk number comes from a trained, calibrated model. Nothing is hard-coded or invented.
+- Three kinds of content look different: **Measured** (your data), **AI estimate** (model output), **Hypothetical** (simulator).
+- The diabetes model needs a **2-hour glucose tolerance** value. A fasting or random glucose is never substituted.
+- The AI explainer answers from stored fields; free-text model replies are used only with consent, and any reply containing a number not in the facts is discarded. Emergency questions never reach a model.
+- Lab reports are processed in memory and never stored. Dates are never guessed. Imports are previewed before saving.
+- Share links store only a hash, are revocable, and expired/revoked/unknown links look identical.
+
+## Features
+Dashboard (gauge, Why, Digital Twin) · risk details with cohort percentile · What-If Simulator · Goal Planner · scenario comparison · Trends and Time Machine · Model Reliability / Trust Meter · lab-report OCR and wearable CSV import · doctor report with share link · privacy (export, consent, delete) · dark mode · English and Hindi (shell, auth, safety notices, settings; other screens still English) · installable PWA (shell only, never caches API data) · Ctrl/⌘+K command palette · axe-clean in light and dark.
+
+## Quick start
+```bash
+# backend (API docs at :8000/docs)
+cd backend && pip install -r requirements.txt
+alembic upgrade head && uvicorn app.main:create_app --factory --reload
+# frontend (:5173)
+cd frontend && npm ci && npm run dev
+```
+Tests: `cd backend && python -m pytest -q` · `cd ml && python -m pytest -q` · `cd frontend && npx tsc --noEmit && npx vitest run`.
+OCR needs the `tesseract-ocr` system package.
+
+## Architecture
+`ml/` training, calibration, SHAP, inference, versioned artifacts and model cards → `backend/` FastAPI + SQLAlchemy + Alembic (JWT with rotating refresh tokens, argon2, rate limits, audit log without health values, append-only measurements) → `frontend/` React 18 + TypeScript + Tailwind v4. Design and API contract: `docs/PHASE1.md`.
+
+## Deploy
+```bash
+cp deploy/.env.example deploy/.env   # set POSTGRES_PASSWORD and HT_SECRET_KEY (32+ chars)
+docker compose --env-file deploy/.env up --build   # app on :8080
+```
+Put HTTPS in front (load balancer, Caddy or Traefik). nginx sets a strict CSP and security headers. **The Dockerfiles and compose stack are untested**: the author's environment had no Docker daemon. Production mode itself (`HT_ENV=prod`, migrations, `/healthz`) was run natively on SQLite.
+
+## Known limitations
+- **Heart model not trained**: needs `ml/data/raw/processed.cleveland.data` (see `ml/README.md`); heart endpoints return 503 until then.
+- The diabetes model was trained on Pima women aged 21–81; results for others are a demonstration only.
+- Not yet verified: Alembic on PostgreSQL, CI on GitHub, the Anthropic provider against the live API, the service worker and CSP in a real browser.
+- Voice input is not built; Hindi is partial.
 
 ## Status
-| Phase | Scope | State |
-|---|---|---|
-| 1 | Structure, database schema, API contract | Done (`docs/PHASE1.md`, `backend/schema.sql`) |
-| 2 | ML training, evaluation, calibration, SHAP, Trust Meter inputs, model cards | Diabetes done; heart model needs `ml/data/raw/processed.cleveland.data` (see `ml/README.md`) |
-| 3 | FastAPI backend (auth, measurements, predictions, scenarios, Goal Planner, privacy) | Done: 61 tests, see `backend/README.md`. Heart endpoints return 503 until the heart model is trained. |
-| 4 | Design system, sign-in, profile and readings, dashboard (gauge, Why, Digital Twin, disease cards) | Done (23 frontend tests) |
-| 5 | Risk details (SHAP walk, cohort percentile), What-If Simulator, Goal Planner, scenario comparison, Trends + Time Machine, Model Reliability | Done (27 frontend tests) |
-| 6 | Lab-report OCR with review, wearable CSV import, grounded AI explainer, doctor report + share links, privacy settings (export, consent, delete) | Done (88 backend, 38 frontend tests) |
-| 7 | Dark mode, Hindi, PWA, command palette, accessibility audit, README/deploy | Not started |
-
-## Layout
-`frontend/` React + TypeScript + Tailwind (dashboard working; run `npm run dev`, API on :8000) · `backend/` FastAPI (working) · `ml/` training, evaluation, inference (working) · `docs/` design and API contract · `e2e/` · `scripts/`
-
-## Try it
-```bash
-cd backend && pip install -r requirements.txt
-uvicorn app.main:create_app --factory --reload   # API docs at /docs
-python -m pytest -q
-```
-
-## ML part
-```bash
-cd ml && pip install -r requirements.txt
-python -m src.train --condition diabetes
-python -m pytest -q
-```
-See `ml/README.md` and `ml/artifacts/diabetes/1.0.0/MODEL_CARD.md`.
+Phases 1–7 done. Phase 7 added dark mode, Hindi, PWA, command palette, accessibility fixes, CI frontend job and deployment files.

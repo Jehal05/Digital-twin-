@@ -32,10 +32,18 @@ describe("DiseaseCard", () => {
 
 describe("EstimateForm", () => {
   it("prefills from the dashboard and tells the user where each value came from", () => {
-    const d = dashboard({ latest_measurements: { glucose_mgdl: { id: "m", content_kind: "measured", measurement_type: "glucose_mgdl", value: 121, unit: "mg/dL", recorded_at: new Date().toISOString(), source: "manual", validation_status: "valid", flag_reason: null, created_at: "" } } });
+    const d = dashboard({ latest_measurements: { glucose_2h_mgdl: { id: "m", content_kind: "measured", measurement_type: "glucose_2h_mgdl", value: 121, unit: "mg/dL", recorded_at: new Date().toISOString(), source: "manual", validation_status: "valid", flag_reason: null, created_at: "" } } });
     const { values, sources } = prefill(d);
-    expect(values.glucose).toBe("121"); expect(values.age).toBe("38"); expect(sources.glucose).toMatch(/measurement/);
+    expect(values.glucose).toBe("121"); expect(values.age).toBe("38"); expect(sources.glucose).toMatch(/2-hour test/);
     expect(values.pregnancies).toBeUndefined(); // never guessed
+  });
+
+  it("never prefills the model's glucose from a fasting reading and says why", () => {
+    const m = { id: "m", content_kind: "measured" as const, measurement_type: "glucose_mgdl", value: 95, unit: "mg/dL", recorded_at: new Date().toISOString(), source: "manual", validation_status: "valid" as const, flag_reason: null, created_at: "" };
+    const d = dashboard({ latest_measurements: { glucose_mgdl: m } });
+    expect(prefill(d).values.glucose).toBeUndefined();
+    render(<EstimateForm data={d} onDone={() => {}} onCancel={() => {}} />);
+    expect(screen.getByRole("note")).toHaveTextContent(/2-hour glucose tolerance test value/);
   });
 
   it("blocks submission with clear messages when values are missing or out of range", async () => {

@@ -18,6 +18,7 @@ TIME_COLUMNS = ("recorded_at", "timestamp", "datetime", "date", "time")
 ALIASES = {
     "weight": "weight_kg", "weight_kg": "weight_kg", "height": "height_cm", "height_cm": "height_cm", "bmi": "bmi",
     "glucose": "glucose_mgdl", "glucose_mgdl": "glucose_mgdl", "glucose_mg_dl": "glucose_mgdl",
+    "glucose_2h": "glucose_2h_mgdl", "glucose_2h_mgdl": "glucose_2h_mgdl", "ogtt": "glucose_2h_mgdl",
     "systolic": "bp_systolic", "bp_systolic": "bp_systolic", "diastolic": "bp_diastolic", "bp_diastolic": "bp_diastolic",
     "cholesterol": "cholesterol_mgdl", "cholesterol_mgdl": "cholesterol_mgdl", "resting_hr": "resting_hr",
     "resting_heart_rate": "resting_hr", "heart_rate_max": "heart_rate_max", "max_hr": "heart_rate_max", "steps": "steps",

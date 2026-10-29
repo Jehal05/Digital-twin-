@@ -8,3 +8,6 @@ node_modules/
 backend/.env
 ml/.env
 dist/
+
+deploy/.env
+*.db

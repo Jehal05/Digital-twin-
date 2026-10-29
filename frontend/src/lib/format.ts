@@ -8,14 +8,14 @@ export const BAND_TEXT: Record<RiskBand, string> = { low: "text-low", moderate: 
 export const BAND_CHIP: Record<RiskBand, string> = { low: "bg-low-bg text-low", moderate: "bg-moderate-bg text-moderate", high: "bg-high-bg text-high" };
 
 export const MEASUREMENT_LABEL: Record<string, string> = {
-  weight_kg: "Weight", height_cm: "Height", bmi: "BMI", glucose_mgdl: "Glucose", bp_systolic: "Systolic BP",
+  weight_kg: "Weight", height_cm: "Height", bmi: "BMI", glucose_mgdl: "Glucose (fasting/random)", glucose_2h_mgdl: "Glucose (2-hour test)", bp_systolic: "Systolic BP",
   bp_diastolic: "Diastolic BP", cholesterol_mgdl: "Cholesterol", heart_rate_max: "Max heart rate", resting_hr: "Resting heart rate",
   steps: "Steps", sleep_hours: "Sleep",
 };
 
 /** Mirrors backend/app/services/measurements.py. The server stays the authority; this only drives the form. */
 export const MEASUREMENT_UNITS: Record<string, string[]> = {
-  weight_kg: ["kg", "lb"], height_cm: ["cm", "in", "m"], bmi: ["kg/m2"], glucose_mgdl: ["mg/dL", "mmol/L"],
+  weight_kg: ["kg", "lb"], height_cm: ["cm", "in", "m"], bmi: ["kg/m2"], glucose_mgdl: ["mg/dL", "mmol/L"], glucose_2h_mgdl: ["mg/dL", "mmol/L"],
   bp_systolic: ["mmHg"], bp_diastolic: ["mmHg"], cholesterol_mgdl: ["mg/dL", "mmol/L"], heart_rate_max: ["bpm"],
   resting_hr: ["bpm"], steps: ["count"], sleep_hours: ["h"],
 };

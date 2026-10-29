@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { session } from "../api/session";
 import { AuthProvider } from "../auth/AuthContext";
+import { PrefsProvider } from "../prefs/PrefsContext";
 import { DashboardProvider } from "../auth/DataContext";
 import { ExplainerPanel } from "../components/explainer/ExplainerPanel";
 import { ImportPage } from "../pages/ImportPage";
@@ -85,7 +86,7 @@ describe("Lab report import", () => {
     expect(save).toBeDisabled();
     await userEvent.type(screen.getByLabelText(/date the sample/i), "2026-10-20");
     await userEvent.click(screen.getByLabelText("Include Cholesterol"));
-    const glucose = screen.getByLabelText("Glucose value");
+    const glucose = screen.getByLabelText("Glucose (fasting/random) value");
     await userEvent.clear(glucose); await userEvent.type(glucose, "128");
     await userEvent.click(screen.getByRole("button", { name: /save 1 reading$/i }));
     await screen.findByText(/Saved 1 reading/);
@@ -154,7 +155,7 @@ describe("SettingsPage", () => {
   it("only enables account deletion after a password and an explicit confirmation", async () => {
     const calls = mockFetch((u) => u.endsWith("/privacy/consents") ? json({ current: {}, history_count: 1, ai_explainer_available: false }) : undefined,
       (u, i) => u.endsWith("/privacy/account") && i?.method === "DELETE" ? new Response(null, { status: 202 }) : undefined);
-    render(<MemoryRouter><AuthProvider><SettingsPage /></AuthProvider></MemoryRouter>);
+    render(<PrefsProvider><MemoryRouter><AuthProvider><SettingsPage /></AuthProvider></MemoryRouter></PrefsProvider>);
     const btn = await screen.findByRole("button", { name: /delete everything/i });
     expect(btn).toBeDisabled();
     await userEvent.type(screen.getByLabelText(/confirm with your password/i), "Secret-pass-123");
@@ -169,7 +170,7 @@ describe("SettingsPage", () => {
   it("records consent changes through the API", async () => {
     const calls = mockFetch((u, i) => u.endsWith("/privacy/consents") && i?.method === "POST" ? json({}, 201) : undefined,
       (u) => u.endsWith("/privacy/consents") ? json({ current: { ai_explainer: { granted: false, recorded_at: "" } }, history_count: 1, ai_explainer_available: true }) : undefined);
-    render(<MemoryRouter><AuthProvider><SettingsPage /></AuthProvider></MemoryRouter>);
+    render(<PrefsProvider><MemoryRouter><AuthProvider><SettingsPage /></AuthProvider></MemoryRouter></PrefsProvider>);
     const box = await screen.findByLabelText(/allow the ai explainer/i);
     await waitFor(() => expect(box).toBeEnabled());
     await userEvent.click(box);

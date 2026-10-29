@@ -143,7 +143,7 @@ function Readings() {
       {items === null ? <p className="text-sm text-muted">Loading…</p> : items.length === 0 ? (
         <EmptyState title="No readings yet">Add your first reading above to start building your history.</EmptyState>
       ) : (
-        <ul className="divide-y divide-[#c9d5ee]">
+        <ul className="divide-y divide-line">
           {items.map((m) => (
             <li key={m.id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <span>{MEASUREMENT_LABEL[m.measurement_type] ?? m.measurement_type}</span>

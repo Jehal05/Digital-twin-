@@ -1,0 +1,15 @@
+{
+  "name": "HealthTwin",
+  "short_name": "HealthTwin",
+  "description": "Explore how your health numbers relate to model-estimated risk. Experimental estimates, not a diagnosis.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#091129",
+  "theme_color": "#2b4f9e",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

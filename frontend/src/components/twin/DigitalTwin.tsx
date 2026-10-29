@@ -22,8 +22,9 @@ function Organ({ c, p, available, reduce, onHover, onSelect }: {
   const has = available && p !== null;
   const color = has ? GLOW[p!.risk_band] : "#8a97b3";
   const strength = has ? 0.28 + 0.62 * p!.score : 0.12;
-  const label = has ? `${NAME[c]} ${pct(p!.score)}` : `${NAME[c]} ${available ? "no estimate yet" : "model not available"}`;
-  const bx = anchor === "start" ? badgeX : badgeX + 76;
+  const visible = `${NAME[c]} ${has ? pct(p!.score) : "—"}`;
+  const label = has ? visible : `${visible}. ${available ? "No estimate yet" : "Model not available"}`;
+  const cx = badgeX + 38;
   return (
     <g tabIndex={0} role="button" aria-label={`${label}. ${SYSTEM[c]}. Press Enter for details.`} style={{ cursor: "pointer" }}
       onMouseEnter={() => onHover(c)} onMouseLeave={() => onHover(null)} onFocus={() => onHover(c)} onBlur={() => onHover(null)}
@@ -32,15 +33,16 @@ function Organ({ c, p, available, reduce, onHover, onSelect }: {
         style={{ ["--glow-min" as string]: strength * 0.7, ["--glow-max" as string]: Math.min(1, strength * 1.15) }} />
       {c === "heart_disease" ? (
         <path d="M0 11 C-20 -4 -13 -20 0 -9 C13 -20 20 -4 0 11Z" transform={`translate(${x} ${y})`} fill={color} fillOpacity={has ? 0.9 : 0.35}
-          stroke="#fff" strokeWidth="1.5" strokeDasharray={has ? undefined : "3 3"} />
+          stroke="var(--color-card)" strokeWidth="1.5" strokeDasharray={has ? undefined : "3 3"} />
       ) : (
         <ellipse cx={x} cy={y} rx={28} ry={9} transform={`rotate(-10 ${x} ${y})`} fill={color} fillOpacity={has ? 0.9 : 0.35}
-          stroke="#fff" strokeWidth="1.5" strokeDasharray={has ? undefined : "3 3"} />
+          stroke="var(--color-card)" strokeWidth="1.5" strokeDasharray={has ? undefined : "3 3"} />
       )}
-      <line x1={x} y1={y} x2={anchor === "start" ? badgeX : badgeX + 76} y2={y - 4} stroke="#10203f" strokeOpacity=".35" strokeWidth="1" strokeDasharray="2 3" />
-      <rect x={anchor === "start" ? badgeX : badgeX} y={y - 24} width="76" height="40" rx="12" fill="#fff" fillOpacity=".92" stroke={color} strokeWidth="1.5" />
-      <text x={bx - (anchor === "start" ? 0 : 76) + 38} y={y - 7} textAnchor="middle" fontSize="9.5" fill="#44536f" fontWeight="600">{NAME[c]}</text>
-      <text x={bx - (anchor === "start" ? 0 : 76) + 38} y={y + 9} textAnchor="middle" fontSize="15" fill="#10203f" fontWeight="700" className="num">{has ? pct(p!.score) : "—"}</text>
+      <line x1={x} y1={y} x2={anchor === "start" ? badgeX : badgeX + 76} y2={y - 4} stroke="var(--color-ink)" strokeOpacity=".35" strokeWidth="1" strokeDasharray="2 3" />
+      <rect x={anchor === "start" ? badgeX : badgeX} y={y - 24} width="76" height="40" rx="12" fill="var(--color-card)" fillOpacity=".92" stroke={color} strokeWidth="1.5" />
+      <text x={cx} y={y - 7} textAnchor="middle" fontSize="9.5" fill="var(--color-ink-muted)" fontWeight="600">
+        <tspan>{NAME[c]}</tspan>{" "}<tspan x={cx} dy="16" fontSize="15" fill="var(--color-ink)" fontWeight="700" className="num">{has ? pct(p!.score) : "\u2014"}</tspan>
+      </text>
     </g>
   );
 }
@@ -72,25 +74,25 @@ export function DigitalTwin({ predictions, available, onSelect, onRun }: {
     return !available.includes(c) ? `${NAME[c]}: model not available` : p ? `${NAME[c]}: ${pct(p.score)}, ${BAND_LABEL[p.risk_band]}` : `${NAME[c]}: no estimate yet`;
   }).join(". ");
   const tip = hover ? predictions[hover] : null;
-  const btn = "grid h-9 w-9 place-items-center rounded-full bg-white/85 text-lg font-semibold text-ink shadow hover:bg-white disabled:opacity-40";
+  const btn = "grid h-9 w-9 place-items-center rounded-full bg-card/85 text-lg font-semibold text-ink shadow hover:bg-card disabled:opacity-40";
 
   return (
     <Glass className="flex flex-col self-start p-5" aria-labelledby="twin-title">
       <CardTitle aside={<ContentTag kind="ai_estimate" />}><span id="twin-title">Your Digital Twin</span></CardTitle>
       <p className="mb-3 text-sm text-muted">A schematic of the model estimates for your current profile. It updates when you run a new estimate.</p>
 
-      <div ref={box} className={`relative overflow-hidden rounded-[20px] bg-gradient-to-b from-white/60 to-[#cfdcf5]/70 ${full ? "h-screen" : "h-[460px]"}`}
+      <div ref={box} className={`relative overflow-hidden rounded-[20px] bg-gradient-to-b from-card/60 to-brand-soft/70 ${full ? "h-screen" : "h-[460px]"}`}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} style={{ touchAction: scale > MIN ? "none" : "auto" }}>
         <div className="grid h-full place-items-center" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`, transition: reduce || drag.current ? "none" : "transform .25s ease", cursor: scale > MIN ? "grab" : "default" }}>
           <svg viewBox="0 0 300 560" className="h-full max-h-[540px]" role="group" aria-label={`Schematic body with model estimates. ${summary}`}>
             <defs>
-              <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".95" /><stop offset="1" stopColor="#b9cdf0" stopOpacity=".75" /></linearGradient>
+              <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="var(--color-card)" stopOpacity=".95" /><stop offset="1" stopColor="var(--color-brand-soft)" stopOpacity=".75" /></linearGradient>
               {(["diabetes", "heart_disease"] as Condition[]).map((c) => {
                 const col = predictions[c] && available.includes(c) ? GLOW[predictions[c]!.risk_band] : "#8a97b3";
                 return <radialGradient key={c} id={`glow-${c}`}><stop offset="0" stopColor={col} stopOpacity="1" /><stop offset="1" stopColor={col} stopOpacity="0" /></radialGradient>;
               })}
             </defs>
-            <g fill="url(#body)" stroke="#fff" strokeWidth="2" aria-hidden>
+            <g fill="url(#body)" stroke="var(--color-card)" strokeWidth="2" aria-hidden>
               <ellipse cx="150" cy="52" rx="27" ry="32" />
               <rect x="138" y="80" width="24" height="24" rx="8" />
               <path d="M88 112 Q150 94 212 112 Q228 120 228 148 L222 262 Q218 294 202 310 L98 310 Q82 294 78 262 L72 148 Q72 120 88 112Z" />
@@ -112,7 +114,7 @@ export function DigitalTwin({ predictions, available, onSelect, onRun }: {
         </div>
 
         {tip && hover && (
-          <div role="tooltip" className="pointer-events-none absolute bottom-3 left-3 right-16 rounded-2xl bg-white/95 p-3 text-sm shadow-lg">
+          <div role="tooltip" className="pointer-events-none absolute bottom-3 left-3 right-16 rounded-2xl bg-card/95 p-3 text-sm shadow-lg">
             <p className="font-semibold">{NAME[hover]} <span className="num">{pct(tip.score, 1)}</span> <span className="font-normal text-muted">({BAND_LABEL[tip.risk_band]})</span></p>
             <ul className="mt-1 space-y-0.5 text-xs text-muted">
               {tip.explanation?.top_drivers.slice(0, 3).map((d) => <li key={d.feature}>{d.label}: {d.value}{d.unit ? ` ${d.unit}` : ""} ({d.direction}, {points(d.effect)})</li>)}

@@ -39,20 +39,20 @@ export function ExplainerPanel() {
           <div className="flex items-center justify-between"><p className="font-semibold">Explain my estimate</p><button onClick={() => setOpen(false)} aria-label="Close explainer" className="text-lg leading-none">×</button></div>
           {!pred ? <p className="mt-2 text-muted">Run an estimate on the dashboard first, then I can explain it.</p> : (
             <>
-              <div className="mt-2 flex flex-wrap gap-1.5">{TOPICS.map(([k, l]) => <button key={k} disabled={busy} onClick={() => void ask({ topic: k }, l)} className="rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold hover:bg-white disabled:opacity-60">{l}</button>)}</div>
+              <div className="mt-2 flex flex-wrap gap-1.5">{TOPICS.map(([k, l]) => <button key={k} disabled={busy} onClick={() => void ask({ topic: k }, l)} className="rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold hover:bg-card disabled:opacity-60">{l}</button>)}</div>
               <div className="mt-3 min-h-[80px] flex-1 space-y-2 overflow-y-auto" aria-live="polite">
                 {msgs.map((m, i) => (<div key={i} className={m.role === "you" ? "text-right" : ""}>
-                  <p className={`inline-block max-w-full rounded-2xl px-3 py-2 text-left ${m.role === "you" ? "bg-brand text-white" : "bg-white"}`}>{m.text}</p>
+                  <p className={`inline-block max-w-full rounded-2xl px-3 py-2 text-left ${m.role === "you" ? "bg-brand text-on-strong" : "bg-card"}`}>{m.text}</p>
                   {m.source && <p className="mt-0.5 text-[11px] text-muted">{SOURCE[m.source]}</p>}</div>))}
                 {busy && <p className="text-xs text-muted">Thinking…</p>}<div ref={end} />
               </div>
               {free ? (
-                <form onSubmit={submit} className="mt-2 flex gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} maxLength={300} aria-label="Ask a question" placeholder="Ask about this estimate" className="min-w-0 flex-1 rounded-full border border-[#9fb0d3] bg-white px-3 py-1.5" /><button disabled={busy || !q.trim()} className="rounded-full bg-brand px-4 text-xs font-semibold text-white disabled:opacity-60">Ask</button></form>
+                <form onSubmit={submit} className="mt-2 flex gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} maxLength={300} aria-label="Ask a question" placeholder="Ask about this estimate" className="min-w-0 flex-1 rounded-full border border-field bg-card px-3 py-1.5" /><button disabled={busy || !q.trim()} className="rounded-full bg-brand px-4 text-xs font-semibold text-on-strong disabled:opacity-60">Ask</button></form>
               ) : <p className="mt-2 text-xs text-muted">Free-text questions are off{consents && !consents.ai_explainer_available ? ": no AI service is configured on this server" : ". Allow them in "}{consents?.ai_explainer_available ? <Link to="/settings" className="font-semibold underline">Settings</Link> : null}.</p>}
               <p className="mt-2 text-[11px] text-muted">Experimental model estimate, not a diagnosis. I explain the model, not your health, and can't help with symptoms.</p>
             </>)}
         </div>)}
-      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="AI explainer" className="grid h-14 w-14 place-items-center rounded-full bg-brand text-xl text-white shadow-lg hover:bg-[#2249a8]">✦</button>
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="AI explainer" className="grid h-14 w-14 place-items-center rounded-full bg-brand text-xl text-on-strong shadow-lg hover:brightness-95">✦</button>
     </div>
   );
 }

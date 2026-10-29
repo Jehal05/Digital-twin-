@@ -24,7 +24,7 @@ export function WhyRisk({ p }: { p: Prediction }) {
                   {d.direction === "raises" ? "▲" : "▼"} {points(d.effect)}
                 </span>
               </div>
-              <div className="mt-2 h-1.5 rounded-full bg-white/70" aria-hidden>
+              <div className="mt-2 h-1.5 rounded-full bg-card/70" aria-hidden>
                 <div className={`h-1.5 rounded-full ${d.direction === "raises" ? "bg-[#e5534b]" : "bg-[#22b573]"}`} style={{ width: `${(Math.abs(d.effect) / max) * 100}%` }} />
               </div>
             </li>

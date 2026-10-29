@@ -20,7 +20,7 @@ export function ReportView({ r }: { r: Report }) {
         <Glass className="p-5" aria-label="Measurements"><CardTitle aside={<ContentTag kind="measured" />}>Readings, last {r.measurement_window_days} days</CardTitle>
           {r.measurements.length === 0 ? <p className="text-sm text-muted">No confirmed readings in this period.</p> : (
             <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="text-xs text-muted"><th className="py-1">Reading</th><th>Latest</th><th>Range</th><th>Count</th><th>Source</th></tr></thead>
-              <tbody>{r.measurements.map((m) => (<tr key={m.measurement_type} className="border-t border-[#c9d5ee]"><td className="py-1.5 font-medium">{MEASUREMENT_LABEL[m.measurement_type] ?? m.measurement_type}</td>
+              <tbody>{r.measurements.map((m) => (<tr key={m.measurement_type} className="border-t border-line"><td className="py-1.5 font-medium">{MEASUREMENT_LABEL[m.measurement_type] ?? m.measurement_type}</td>
                 <td className="num">{m.latest} {m.unit} <span className="text-xs text-muted">({shortDate(m.latest_at)})</span></td><td className="num">{m.min} to {m.max}</td><td className="num">{m.count}</td><td className="text-xs">{m.sources.join(", ")}</td></tr>))}</tbody></table></div>)}
           <p className="mt-2 text-xs text-muted">Readings flagged as unusual and not yet confirmed are left out.</p></Glass>)}
       {r.estimates && (

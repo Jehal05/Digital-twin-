@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import { DashboardProvider } from "./auth/DataContext";
+import { usePrefs, PrefsProvider } from "./prefs/PrefsContext";
 import { AppShell } from "./components/layout/AppShell";
 import { AuthPage } from "./pages/AuthPage";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -16,6 +18,8 @@ import { TrendsPage } from "./pages/TrendsPage";
 
 function Gate() {
   const { status } = useAuth();
+  const { syncWithServer } = usePrefs();
+  useEffect(() => { if (status === "authenticated") void syncWithServer(); }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
   if (status === "loading") return <p role="status" className="p-8 text-center text-muted">Loading…</p>;
   if (status === "anonymous") return <AuthPage />;
   return (
@@ -40,11 +44,11 @@ function Gate() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <PrefsProvider><BrowserRouter>
       <Routes>
         <Route path="/shared/:token" element={<SharedPage />} />
         <Route path="*" element={<AuthProvider><Gate /></AuthProvider>} />
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter></PrefsProvider>
   );
 }

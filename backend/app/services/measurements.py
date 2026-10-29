@@ -20,6 +20,7 @@ CATALOG: dict[str, Spec] = {
     "height_cm": Spec("cm", 50, 250, {"cm": 1, "m": 100, "in": 2.54}, 0.05),
     "bmi": Spec("kg/m2", 10, 80, {"kg/m2": 1}, 0.10),
     "glucose_mgdl": Spec("mg/dL", 30, 600, {"mg/dl": 1, "mmol/l": 18.016}, 0.60),
+    "glucose_2h_mgdl": Spec("mg/dL", 30, 600, {"mg/dl": 1, "mmol/l": 18.016}, 0.60),  # 2-hour OGTT value: the one the diabetes model uses
     "bp_systolic": Spec("mmHg", 50, 260, {"mmhg": 1}, 0.40),
     "bp_diastolic": Spec("mmHg", 30, 160, {"mmhg": 1}, 0.40),
     "cholesterol_mgdl": Spec("mg/dL", 50, 700, {"mg/dl": 1, "mmol/l": 38.67}, 0.50),

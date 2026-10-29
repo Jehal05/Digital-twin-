@@ -31,14 +31,14 @@ function Sharing() {
       <fieldset className="flex flex-wrap gap-4 text-sm"><legend className="mb-1 text-xs text-muted">Include</legend>
         {SECTIONS.map(([k, label]) => <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={inc.includes(k)} onChange={(e) => setInc(e.target.checked ? [...inc, k] : inc.filter((x) => x !== k))} />{label}</label>)}</fieldset>
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <label className="text-sm">Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} className="ml-1 rounded-lg border border-[#9fb0d3] bg-white px-2 py-1">
+        <label className="text-sm">Expires in <select value={days} onChange={(e) => setDays(Number(e.target.value))} className="ml-1 rounded-lg border border-field bg-card px-2 py-1">
           {[1, 3, 7, 14, 30].map((d) => <option key={d} value={d}>{d} day{d > 1 ? "s" : ""}</option>)}</select></label>
         <Button onClick={() => void create()} disabled={inc.length === 0}>Create link</Button>
       </div>
       {msg && <p role="alert" className="mt-2 text-sm text-high">{msg}</p>}
       {fresh && url && (
         <div className="mt-3 rounded-xl bg-low-bg p-3 text-sm" role="status"><p className="font-semibold text-low">Link created. Copy it now: it will not be shown again.</p>
-          <div className="mt-1 flex gap-2"><input readOnly aria-label="Share link" value={url} onFocus={(e) => e.currentTarget.select()} className="min-w-0 flex-1 rounded-lg border border-[#9fb0d3] bg-white px-2 py-1 text-xs" />
+          <div className="mt-1 flex gap-2"><input readOnly aria-label="Share link" value={url} onFocus={(e) => e.currentTarget.select()} className="min-w-0 flex-1 rounded-lg border border-field bg-card px-2 py-1 text-xs" />
             <Button variant="secondary" className="min-h-8" onClick={() => void navigator.clipboard?.writeText(url)}>Copy</Button></div></div>)}
       <h3 className="mt-4 text-sm font-semibold">Your links</h3>
       {links === null ? <Skeleton className="mt-2 h-10" /> : links.length === 0 ? <p className="mt-1 text-sm text-muted">No links yet.</p> : (

@@ -37,7 +37,7 @@ export function RiskGauge({ p }: { p: Prediction }) {
       <div className="mt-5" role="meter" aria-label="Model-estimated probability" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value)}>
         <div className="relative h-3 rounded-full risk-bar">
           {t && (
-            <div className="absolute top-0 h-3 rounded-full bg-white/45 ring-1 ring-white/80"
+            <div className="absolute top-0 h-3 rounded-full bg-card/45 ring-1 ring-white/80"
               style={{ left: `${t.uncertainty_range.low * 100}%`, width: `${Math.max(1, (t.uncertainty_range.high - t.uncertainty_range.low) * 100)}%` }}
               title={`Model range ${pct(t.uncertainty_range.low)} to ${pct(t.uncertainty_range.high)}`} />
           )}

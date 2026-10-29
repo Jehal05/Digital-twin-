@@ -40,7 +40,7 @@ def test_use_latest_assembles_inputs_from_profile_and_measurements_with_sources(
     dob = date.today().replace(year=date.today().year - 40) - timedelta(days=30)
     user.put("/profile", {"date_of_birth": dob.isoformat(), "sex": "female", "height_cm": 165})
     when = (NOW - timedelta(days=2)).isoformat()
-    for t, v, u in [("glucose_mgdl", 6.7, "mmol/L"), ("bp_diastolic", 80, "mmHg"), ("weight_kg", 82, "kg")]:
+    for t, v, u in [("glucose_2h_mgdl", 6.7, "mmol/L"), ("bp_diastolic", 80, "mmHg"), ("weight_kg", 82, "kg")]:
         assert user.post("/measurements", {"measurement_type": t, "value": v, "unit": u, "recorded_at": when}).status_code == 201
     r = user.post("/predictions/diabetes", {"use_latest": True, "features": {"pregnancies": 1}})
     assert r.status_code == 201, r.text
@@ -51,7 +51,7 @@ def test_use_latest_assembles_inputs_from_profile_and_measurements_with_sources(
 
 
 def test_explicit_values_override_measurements(user):
-    user.post("/measurements", {"measurement_type": "glucose_mgdl", "value": 90, "unit": "mg/dL",
+    user.post("/measurements", {"measurement_type": "glucose_2h_mgdl", "value": 90, "unit": "mg/dL",
                                 "recorded_at": (NOW - timedelta(hours=2)).isoformat()})
     r = user.post("/predictions/diabetes", {"use_latest": True, "features": {**PROFILE, "glucose": 150}})
     assert r.json()["input_snapshot"]["glucose"] == 150.0
@@ -94,3 +94,11 @@ def test_cohort_percentile_is_labelled_as_cohort_only(user):
     far = user.get("/cohort/percentile", params={"condition": "diabetes", "feature": "glucose", "value": 399}).json()
     assert far["percentile"] == 100 and far["outside_cohort_range"] is True
     assert user.get("/cohort/percentile", params={"condition": "diabetes", "feature": "bogus", "value": 1}).status_code == 422
+
+
+def test_a_fasting_glucose_is_never_used_as_the_two_hour_value(user):
+    when = (NOW - timedelta(days=1)).isoformat()
+    assert user.post("/measurements", {"measurement_type": "glucose_mgdl", "value": 95, "unit": "mg/dL", "recorded_at": when}).status_code == 201
+    r = user.post("/predictions/diabetes", {"use_latest": True, "features": {"pregnancies": 1, "blood_pressure": 70, "bmi": 28, "age": 40}})
+    assert r.status_code == 422 and r.json()["error"]["code"] == "missing_inputs"
+    assert "2-hour" in r.json()["error"]["fields"]["glucose"]

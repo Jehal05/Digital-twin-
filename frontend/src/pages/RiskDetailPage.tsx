@@ -55,7 +55,7 @@ export function RiskDetailPage() {
     <nav aria-label="Condition" className="mb-4 flex gap-2">
       {(["diabetes", "heart_disease"] as Condition[]).map((c) => (
         <Link key={c} to={`/risk/${c}`} aria-current={c === condition ? "page" : undefined}
-          className={`rounded-full px-4 py-1.5 text-sm font-semibold ${c === condition ? "bg-brand text-white" : "bg-white/70 hover:bg-white"}`}>{c === "diabetes" ? "Diabetes" : "Heart disease"}</Link>
+          className={`rounded-full px-4 py-1.5 text-sm font-semibold ${c === condition ? "bg-brand text-on-strong" : "bg-card/70 hover:bg-card"}`}>{c === "diabetes" ? "Diabetes" : "Heart disease"}</Link>
       ))}
     </nav>
   );

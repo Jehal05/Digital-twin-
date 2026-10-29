@@ -25,7 +25,7 @@ function FileInput({ label, accept, onFile, busy }: { label: string; accept: str
   return (
     <label className="block text-sm font-medium">{label}
       <input type="file" accept={accept} disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }}
-        className="mt-1 block w-full rounded-xl border border-dashed border-[#9fb0d3] bg-white/80 p-3 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-4 file:py-1.5 file:text-sm file:font-semibold file:text-white" />
+        className="mt-1 block w-full rounded-xl border border-dashed border-field bg-card/80 p-3 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-4 file:py-1.5 file:text-sm file:font-semibold file:text-on-strong" />
     </label>
   );
 }
@@ -57,8 +57,8 @@ function CsvImport() {
       {p && (
         <div className="mt-4">
           <p className="text-sm"><strong>{p.summary.ok}</strong> valid, <strong className={p.summary.errors ? "text-high" : ""}>{p.summary.errors}</strong> with problems. Problem rows are not saved.</p>
-          <div className="mt-2 max-h-72 overflow-auto rounded-xl bg-white/70"><table className="w-full text-left text-xs"><thead className="sticky top-0 bg-white"><tr><th className="p-2">Line</th><th>Reading</th><th>Value</th><th>When (UTC)</th><th>Status</th></tr></thead>
-            <tbody>{p.rows.slice(0, 200).map((r, i) => (<tr key={i} className="border-t border-[#c9d5ee]"><td className="p-2 num">{r.line}</td><td>{MEASUREMENT_LABEL[r.measurement_type] ?? r.measurement_type}</td>
+          <div className="mt-2 max-h-72 overflow-auto rounded-xl bg-card/70"><table className="w-full text-left text-xs"><thead className="sticky top-0 bg-card"><tr><th className="p-2">Line</th><th>Reading</th><th>Value</th><th>When (UTC)</th><th>Status</th></tr></thead>
+            <tbody>{p.rows.slice(0, 200).map((r, i) => (<tr key={i} className="border-t border-line"><td className="p-2 num">{r.line}</td><td>{MEASUREMENT_LABEL[r.measurement_type] ?? r.measurement_type}</td>
               <td className="num">{r.value ?? "—"} {r.unit}</td><td className="num">{r.recorded_at?.slice(0, 16).replace("T", " ") ?? "—"}</td>
               <td>{r.status === "ok" ? <span className="text-low">{r.note ? `OK (${r.note})` : "OK"}</span> : <span className="font-medium text-high">{r.message}</span>}</td></tr>))}</tbody></table></div>
           {p.rows.length > 200 && <p className="mt-1 text-xs text-muted">Showing the first 200 of {p.rows.length} rows.</p>}
@@ -117,15 +117,15 @@ function LabImport() {
                 <div className="flex flex-wrap items-center gap-3">
                   <input type="checkbox" checked={i.include} aria-label={`Include ${MEASUREMENT_LABEL[i.type]}`} onChange={(e) => set(i.key, { include: e.target.checked })} />
                   <span className="w-28 font-medium">{MEASUREMENT_LABEL[i.type] ?? i.type}</span>
-                  <input aria-label={`${MEASUREMENT_LABEL[i.type]} value`} inputMode="decimal" value={i.value} onChange={(e) => set(i.key, { value: e.target.value })} className="num w-24 rounded-lg border border-[#9fb0d3] bg-white px-2 py-1" />
-                  <select aria-label={`${MEASUREMENT_LABEL[i.type]} unit`} value={i.unit} onChange={(e) => set(i.key, { unit: e.target.value })} className="rounded-lg border border-[#9fb0d3] bg-white px-2 py-1">
+                  <input aria-label={`${MEASUREMENT_LABEL[i.type]} value`} inputMode="decimal" value={i.value} onChange={(e) => set(i.key, { value: e.target.value })} className="num w-24 rounded-lg border border-field bg-card px-2 py-1" />
+                  <select aria-label={`${MEASUREMENT_LABEL[i.type]} unit`} value={i.unit} onChange={(e) => set(i.key, { unit: e.target.value })} className="rounded-lg border border-field bg-card px-2 py-1">
                     {(MEASUREMENT_UNITS[i.type] ?? [i.unit]).map((u) => <option key={u}>{u}</option>)}</select>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${i.conf === "high" ? "bg-low-bg text-low" : i.conf === "medium" ? "bg-moderate-bg text-moderate" : "bg-high-bg text-high"}`}>{i.conf} confidence</span>
                 </div>
                 <p className="mt-1 text-xs text-muted">Found: “{i.snippet}”{!i.unitSeen && <span className="font-medium text-moderate"> · no unit found in the text, please confirm it</span>}</p>
               </li>))}</ul>)}
           <div><label htmlFor="lab-date" className="text-sm font-medium">Date the sample was taken (required)</label>
-            <div className="mt-1 flex flex-wrap items-center gap-2"><input id="lab-date" type="date" max={today} value={date} onChange={(e) => setDate(e.target.value)} className="rounded-lg border border-[#9fb0d3] bg-white px-2 py-1 text-sm" />
+            <div className="mt-1 flex flex-wrap items-center gap-2"><input id="lab-date" type="date" max={today} value={date} onChange={(e) => setDate(e.target.value)} className="rounded-lg border border-field bg-card px-2 py-1 text-sm" />
               {pv.detected_dates.map((d) => <button key={d} type="button" onClick={() => setDate(d)} className="rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold">Use {d}</button>)}</div>
             <p className="mt-1 text-xs text-muted">{pv.ambiguous_dates_found ? "The report has dates like 03/04/2026 that could be read two ways, so please choose the date yourself. " : ""}The time is recorded as 12:00.</p></div>
           <div className="flex gap-2"><Button onClick={() => void save()} disabled={busy || !date || chosen.length === 0}>Save {chosen.length} reading{chosen.length === 1 ? "" : "s"}</Button><Button variant="ghost" onClick={() => { setPv(null); setItems([]); }}>Cancel</Button></div>

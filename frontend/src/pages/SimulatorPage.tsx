@@ -17,7 +17,7 @@ const signed = (pp: number) => `${pp > 0 ? "+" : pp < 0 ? "−" : ""}${Math.abs(
 
 function Compare({ base, scen }: { base: Prediction; scen: Prediction }) {
   const Row = ({ p, tag, label }: { p: Prediction; tag: "ai_estimate" | "hypothetical"; label: string }) => (
-    <div className={`rounded-2xl p-4 ${tag === "hypothetical" ? "hatched border border-dashed border-brand bg-white/60" : "bg-white/80"}`}>
+    <div className={`rounded-2xl p-4 ${tag === "hypothetical" ? "hatched border border-dashed border-brand bg-card/60" : "bg-card/80"}`}>
       <div className="flex items-center justify-between"><span className="text-sm font-semibold">{label}</span><ContentTag kind={tag} /></div>
       <p className="num mt-1 text-3xl font-bold">{pct(p.score, 1)}</p>
       <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${BAND_CHIP[p.risk_band]}`}>{BAND_LABEL[p.risk_band]}</span>
@@ -89,13 +89,13 @@ export function SimulatorPage() {
               <div key={name}>
                 <div className="flex items-baseline justify-between"><label htmlFor={`sl-${name}`} className="text-sm font-medium">{f.label}</label>
                   <span className="num text-sm"><strong>{v}</strong> {f.unit} <span className="text-muted">(baseline {b})</span></span></div>
-                <input id={`sl-${name}`} type="range" min={f.min} max={f.max} step={f.step} value={v} className="mt-1 w-full accent-[#2a58c8]"
+                <input id={`sl-${name}`} type="range" min={f.min} max={f.max} step={f.step} value={v} className="mt-1 w-full accent-brand"
                   onChange={(e) => setVals({ ...vals, [name]: Number(e.target.value) })} />
               </div>
             );
           })}
-          <dl className="panel-dim grid grid-cols-2 gap-2 p-3 text-xs"><dt className="col-span-2 font-semibold">Fixed inputs (cannot be simulated)</dt>
-            {["age", "pregnancies"].map((k) => <div key={k} className="flex justify-between"><dt className="capitalize text-muted">{k}</dt><dd className="num font-semibold">{base.input_snapshot[k]}</dd></div>)}</dl>
+          <div className="panel-dim p-3 text-xs"><p className="font-semibold">Fixed inputs (cannot be simulated)</p>
+            <dl className="mt-2 grid grid-cols-2 gap-2">{["age", "pregnancies"].map((k) => <div key={k} className="flex justify-between"><dt className="capitalize text-muted">{k}</dt><dd className="num font-semibold">{base.input_snapshot[k]}</dd></div>)}</dl></div>
         </div>
         <div className="mt-4 flex items-center gap-3">
           <Button onClick={() => void run()} disabled={busy || Object.keys(changed).length === 0}>{busy ? "Running…" : "Run scenario"}</Button>
@@ -111,7 +111,7 @@ export function SimulatorPage() {
           <CardTitle aside={<ContentTag kind="hypothetical" />}>Goal Planner</CardTitle>
           <p className="mb-3 text-sm text-muted">Pick a target. The planner searches realistic decreases with the real model and returns the smallest change it found.</p>
           <label htmlFor="goal" className="text-sm font-medium">Target: estimate below <span className="num font-bold">{target}%</span> <span className="text-muted">(baseline {pct(base.score, 1)})</span></label>
-          <input id="goal" type="range" min={2} max={Math.max(3, Math.floor(base.score * 100) - 1)} value={target} onChange={(e) => setTarget(Number(e.target.value))} className="mt-1 w-full accent-[#2a58c8]" />
+          <input id="goal" type="range" min={2} max={Math.max(3, Math.floor(base.score * 100) - 1)} value={target} onChange={(e) => setTarget(Number(e.target.value))} className="mt-1 w-full accent-brand" />
           <fieldset className="mt-2 flex flex-wrap gap-4 text-sm"><legend className="text-xs text-muted">Keep these unchanged</legend>
             {EDITABLE.map((f) => <label key={f} className="flex items-center gap-1.5"><input type="checkbox" checked={locked.includes(f)}
               onChange={(e) => setLocked(e.target.checked ? [...locked, f] : locked.filter((x) => x !== f))} />{DIABETES_FIELDS.find((x) => x.name === f)?.label}</label>)}</fieldset>
@@ -149,8 +149,8 @@ export function SimulatorPage() {
                 <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-sm"><caption className="mb-1 text-left text-xs text-muted">Hypothetical estimates compared with your real baseline</caption>
                   <thead><tr className="text-xs text-muted"><th className="py-1">Scenario</th><th>Changes</th><th className="text-right">Estimate</th><th className="text-right">Δ</th></tr></thead>
                   <tbody>
-                    <tr className="border-t border-[#c9d5ee]"><td className="py-1.5 font-semibold">Baseline <ContentTag kind="ai_estimate" /></td><td>—</td><td className="num text-right font-semibold">{pct(base.score, 1)}</td><td /></tr>
-                    {chosen.map((s) => (<tr key={s.id} className="hatched border-t border-[#c9d5ee]"><td className="py-1.5">{s.name}</td>
+                    <tr className="border-t border-line"><td className="py-1.5 font-semibold">Baseline <ContentTag kind="ai_estimate" /></td><td>—</td><td className="num text-right font-semibold">{pct(base.score, 1)}</td><td /></tr>
+                    {chosen.map((s) => (<tr key={s.id} className="hatched border-t border-line"><td className="py-1.5">{s.name}</td>
                       <td className="text-xs">{Object.entries(s.changed_inputs).map(([k, v]) => `${k} ${s.baseline.input_snapshot[k]}→${v}`).join(", ")}</td>
                       <td className="num text-right font-semibold">{pct(s.scenario.score, 1)}</td><td className="num text-right">{signed(s.delta_pp)}</td></tr>))}
                   </tbody></table></div>)}

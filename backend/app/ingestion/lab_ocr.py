@@ -71,8 +71,10 @@ def _ocr_images(images) -> tuple[str, float | None, str]:
 NUM = r"(\d{1,4}(?:[.,]\d{1,2})?)"
 UNIT_GLU = r"(mg\s*/\s*dl|mmol\s*/\s*l)"
 UNIT_CHOL = r"(mg\s*/\s*dl|mmol\s*/\s*l)"
+GLU2H = re.compile(rf"(?:glucose[,\s]*2\s*-?\s*h(?:ou)?rs?(?:\s*post[-\s]?\w+)?|2\s*-?\s*h(?:ou)?rs?\.?\s*(?:post[-\s]?(?:prandial|load|glucose)\s*)?(?:plasma\s*)?(?:glucose|sugar)|"
+                   rf"ogtt|glucose\s*tolerance(?:\s*test)?[^\d\n]{{0,15}}2\s*-?\s*h(?:ou)?rs?|post[-\s]?(?:prandial|load)\s*(?:plasma\s*)?(?:glucose|sugar)|ppbs)[^\d\n]{{0,25}}{NUM}\s*{UNIT_GLU}?", re.I)
 RULES = [
-    ("glucose_mgdl", re.compile(rf"(?:fasting\s+)?(?:blood\s+)?(?:glucose|sugar|fbs|rbs|ppbs)[^\d\n]{{0,25}}{NUM}\s*{UNIT_GLU}?", re.I)),
+    ("glucose_mgdl", re.compile(rf"(?:fasting\s+)?(?:blood\s+)?(?:glucose|sugar|fbs|rbs)[^\d\n]{{0,25}}{NUM}\s*{UNIT_GLU}?", re.I)),
     ("cholesterol_mgdl", re.compile(rf"(?:total\s+cholesterol|cholesterol[,\s]*total|cholesterol)[^\d\n]{{0,25}}{NUM}\s*{UNIT_CHOL}?", re.I)),
     ("weight_kg", re.compile(rf"weight[^\d\n]{{0,15}}{NUM}\s*(kg|lbs?)?", re.I)),
     ("height_cm", re.compile(rf"height[^\d\n]{{0,15}}{NUM}\s*(cm|m|in)?", re.I)),
@@ -89,11 +91,16 @@ def _num(s: str) -> float:
 
 
 def candidates(text: str, ocr_confidence: float | None) -> dict:
-    found = []
-    for mtype, rx in RULES:
+    found, taken = [], []
+    two_hour = [("glucose_2h_mgdl", GLU2H)]
+    for mtype, rx in two_hour + RULES:
         for m in rx.finditer(text):
+            if mtype == "glucose_mgdl" and any(a < m.end() and m.start() < b for a, b in taken):
+                continue  # this line is the 2-hour value already found; do not also file it as fasting/random
+            if mtype == "glucose_2h_mgdl":
+                taken.append((m.start(), m.end()))
             value, unit = _num(m.group(1)), (m.group(2) or "").replace(" ", "")
-            canonical_default = {"glucose_mgdl": "mg/dL", "cholesterol_mgdl": "mg/dL", "weight_kg": "kg", "height_cm": "cm"}[mtype]
+            canonical_default = {"glucose_mgdl": "mg/dL", "glucose_2h_mgdl": "mg/dL", "cholesterol_mgdl": "mg/dL", "weight_kg": "kg", "height_cm": "cm"}[mtype]
             unit_seen = bool(unit)
             unit = {"mg/dl": "mg/dL", "mmol/l": "mmol/L"}.get(unit.lower(), unit) or canonical_default
             found.append({"measurement_type": mtype, "value": value, "unit": unit, "unit_found_in_text": unit_seen,

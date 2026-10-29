@@ -23,7 +23,8 @@ export function refreshSession(): Promise<boolean> {
     try {
       const res = await fetch(`${BASE}/auth/refresh`, { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh_token: token }) });
-      if (!res.ok) { session.clear(); return false; }
+      if (res.status === 401 || res.status === 403) { session.clear(); return false; }   // definitively invalid
+      if (!res.ok) return false;                                                          // 429/5xx: keep the token, try again later
       setTokens(await res.json());
       return true;
     } catch { return false; } finally { refreshing = null; }

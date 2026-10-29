@@ -1,0 +1,35 @@
+# docker compose --env-file deploy/.env up --build
+# Terminate HTTPS in front of this stack (a load balancer, Caddy or Traefik); the app sets no cookies and sends tokens in headers.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: healthtwin
+      POSTGRES_USER: healthtwin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthtwin -d healthtwin"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: { context: ., dockerfile: deploy/Dockerfile.backend }
+    environment:
+      HT_ENV: prod
+      HT_SECRET_KEY: ${HT_SECRET_KEY:?set HT_SECRET_KEY (32+ random characters) in deploy/.env}
+      HT_DATABASE_URL: postgresql+psycopg://healthtwin:${POSTGRES_PASSWORD}@db:5432/healthtwin
+      HT_CORS_ORIGINS: '["${PUBLIC_ORIGIN:-http://localhost:8080}"]'
+      HT_ANTHROPIC_API_KEY: ${HT_ANTHROPIC_API_KEY:-}
+    depends_on: { db: { condition: service_healthy } }
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: deploy/Dockerfile.frontend }
+    ports: ["8080:80"]
+    depends_on: [api]
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -25,7 +25,7 @@ function Metrics({ item }: { item: EvalItem }) {
         <CardTitle>Two models, one rule</CardTitle>
         <p className="mb-3 text-sm text-muted">{m.selection_rule} Primary model: <strong>{NAME[m.primary_algorithm]}</strong>. Scores are on {m.split.test_rows} held-out rows, so small differences are noise.</p>
         <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="text-xs text-muted"><th className="py-1">Model</th><th>CV AUC</th><th>Test AUC</th><th>Brier</th><th>Calib. gap</th></tr></thead>
-          <tbody>{Object.entries(m.models).map(([k, v]) => (<tr key={k} className="border-t border-[#c9d5ee]"><td className="py-1.5 font-medium">{NAME[k]}{v.is_primary ? " ★" : ""}</td>
+          <tbody>{Object.entries(m.models).map(([k, v]) => (<tr key={k} className="border-t border-line"><td className="py-1.5 font-medium">{NAME[k]}{v.is_primary ? " ★" : ""}</td>
             <td className="num">{f3(v.cv_roc_auc_train)} ± {f3(v.cv_roc_auc_std)}</td><td className="num">{f3(v.test.roc_auc)}</td><td className="num">{f3(v.test.brier_score)}</td><td className="num">{f3(v.test.calibration_gap.mean_abs)}</td></tr>))}</tbody></table></div>
         <p className="mt-2 text-xs text-muted">★ primary. AUC: 0.5 is a coin flip, 1.0 is perfect. Brier and calibration gap: lower is better.</p>
       </Glass>
@@ -33,7 +33,7 @@ function Metrics({ item }: { item: EvalItem }) {
       <Glass className="p-5" aria-label="Errors at the operating threshold">
         <CardTitle>What the mistakes look like</CardTitle>
         <p className="mb-2 text-sm text-muted">At the cut-off {pct1(op.threshold)} (chosen on training data), out of {m.split.test_rows} test rows:</p>
-        <table className="w-full max-w-sm text-center text-sm" aria-label="Confusion matrix"><thead><tr className="text-xs text-muted"><th /><th>Model says higher</th><th>Model says lower</th></tr></thead>
+        <table className="w-full max-w-sm text-center text-sm" aria-label="Confusion matrix"><thead><tr className="text-xs text-muted"><th><span className="sr-only">Actual condition</span></th><th>Model says higher</th><th>Model says lower</th></tr></thead>
           <tbody><tr><th className="text-left text-xs text-muted">Condition present</th><td className="panel-dim num p-2 font-bold">{cm.tp} <span className="block text-[11px] font-normal text-muted">caught</span></td><td className="num p-2 font-bold text-high">{cm.fn} <span className="block text-[11px] font-normal text-muted">missed</span></td></tr>
             <tr><th className="text-left text-xs text-muted">Not present</th><td className="num p-2 font-bold text-moderate">{cm.fp} <span className="block text-[11px] font-normal text-muted">false alarm</span></td><td className="panel-dim num p-2 font-bold">{cm.tn} <span className="block text-[11px] font-normal text-muted">correct</span></td></tr></tbody></table>
         <p className="num mt-3 text-sm">Sensitivity {pct1(op.sensitivity)} · Specificity {pct1(op.specificity)} · Precision {pct1(op.precision)}</p>
@@ -85,7 +85,7 @@ export function ReliabilityPage() {
     <div className="space-y-4">
       <Glass className="p-5"><h1 className="text-2xl font-bold tracking-tight">Model reliability</h1>
         <p className="mt-1 text-sm text-muted">Everything here was measured on public research datasets, not on you. These are experimental estimates, not diagnoses.</p></Glass>
-      {items.map((it) => <section key={it.condition} aria-label={`${it.condition} evaluation`}><h2 className="mb-2 inline-block rounded-full bg-white/80 px-4 py-1 text-lg font-semibold">{it.condition === "diabetes" ? "Diabetes" : "Heart disease"} <span className="text-sm font-normal text-muted">v{it.version}</span></h2><Metrics item={it} /></section>)}
+      {items.map((it) => <section key={it.condition} aria-label={`${it.condition} evaluation`}><h2 className="mb-2 inline-block rounded-full bg-card/80 px-4 py-1 text-lg font-semibold">{it.condition === "diabetes" ? "Diabetes" : "Heart disease"} <span className="text-sm font-normal text-muted">v{it.version}</span></h2><Metrics item={it} /></section>)}
       {missing.map((c) => <EmptyState key={c} title={`${c === "diabetes" ? "Diabetes" : "Heart disease"} model not trained`}>No evaluation is shown because there is no model yet.</EmptyState>)}
     </div>
   );

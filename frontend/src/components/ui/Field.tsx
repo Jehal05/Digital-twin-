@@ -1,6 +1,6 @@
 import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
 
-const BASE = "mt-1 block w-full rounded-xl border border-[#9fb0d3] bg-white px-3 py-2 text-sm text-ink placeholder:text-[#6b7894] aria-[invalid=true]:border-high aria-[invalid=true]:bg-high-bg/40";
+const BASE = "mt-1 block w-full rounded-xl border border-field bg-card px-3 py-2 text-sm text-ink placeholder:text-muted aria-[invalid=true]:border-high aria-[invalid=true]:bg-high-bg/40";
 
 interface Common { label: string; hint?: ReactNode; error?: string }
 

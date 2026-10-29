@@ -119,3 +119,10 @@ def test_pdf_with_a_text_layer_is_read_without_ocr(user):
 def test_import_endpoints_need_login(client):
     assert client.post("/api/v1/imports/commit", json={}).status_code == 401
     assert client.post("/api/v1/imports/csv/preview", files={"file": ("a.csv", "x")}).status_code == 401
+
+
+@needs_tesseract
+def test_two_hour_glucose_is_kept_separate_from_fasting_glucose(user):
+    png = lab_image(["Fasting Glucose 92 mg/dL", "2 hour post load glucose 148 mg/dL"])
+    found = {(c["measurement_type"], c["value"]) for c in upload(user, "/imports/lab-report/preview", "r.png", png, "image/png").json()["candidates"]}
+    assert ("glucose_mgdl", 92.0) in found and ("glucose_2h_mgdl", 148.0) in found and ("glucose_mgdl", 148.0) not in found
