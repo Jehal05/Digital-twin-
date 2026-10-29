@@ -19,7 +19,7 @@ export function DiseaseCard({ condition, prediction, available, active, onSelect
       </div>
 
       {!available ? (
-        <p className="mt-3 text-sm text-muted">This model has not been trained yet. The heart disease estimate needs the UCI Cleveland dataset.</p>
+        <p className="mt-3 text-sm text-muted">This model is not available right now.</p>
       ) : prediction ? (
         <>
           <p className="num mt-2 text-3xl font-bold">{pct(prediction.score, 1)}</p>

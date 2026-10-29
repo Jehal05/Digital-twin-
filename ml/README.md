@@ -15,7 +15,7 @@ Artifacts go to `artifacts/<condition>/<version>/` (model, schema, metrics, coho
 | Condition | File | Status |
 |---|---|---|
 | diabetes | `pima.csv` (768 rows, no header, 9 columns) | Present. Mirror of the NIDDK file; verify SHA-256 in `manifest.json`. |
-| heart_disease | `processed.cleveland.data` (303 rows, 14 columns, `?` = missing) | **Needed.** Download the ORIGINAL file from the UCI repository (Heart Disease dataset, `processed.cleveland.data`). Do not use Kaggle `heart.csv`: it recodes columns and flips the target; the loader rejects it. |
+| heart_disease | `processed.cleveland.data` (303 rows, 14 columns, `?` = missing) | Present (trained, v1.0.0). To retrain, download the ORIGINAL file from the UCI repository (Heart Disease dataset, `processed.cleveland.data`). Do not use Kaggle `heart.csv`: it recodes columns and flips the target; the loader rejects it. |
 
 ## Using the model from the backend
 ```python

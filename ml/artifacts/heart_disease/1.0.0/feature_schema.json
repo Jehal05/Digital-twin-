@@ -1,0 +1,121 @@
+{
+  "condition": "heart_disease",
+  "version": "1.0.0",
+  "outcome_definition": "Angiographic heart disease (any vessel narrowing) found at the time of testing, not future heart attack risk.",
+  "population_note": "Training data covers 303 patients referred for coronary angiography at one clinic (Cleveland). It is not a general-population sample.",
+  "risk_band_edges": [
+    0.2,
+    0.5
+  ],
+  "features": [
+    {
+      "name": "age",
+      "label": "Age",
+      "unit": "years",
+      "kind": "integer",
+      "min": 18,
+      "max": 100,
+      "editable": false,
+      "categories": []
+    },
+    {
+      "name": "sex",
+      "label": "Sex (1 = male, 0 = female)",
+      "unit": "",
+      "kind": "binary",
+      "min": 0,
+      "max": 1,
+      "editable": false,
+      "categories": []
+    },
+    {
+      "name": "cp",
+      "label": "Chest pain type (1 typical angina, 2 atypical, 3 non-anginal, 4 asymptomatic)",
+      "unit": "",
+      "kind": "categorical",
+      "min": 1,
+      "max": 4,
+      "editable": false,
+      "categories": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "name": "trestbps",
+      "label": "Resting systolic blood pressure",
+      "unit": "mmHg",
+      "kind": "continuous",
+      "min": 70,
+      "max": 250,
+      "editable": true,
+      "categories": []
+    },
+    {
+      "name": "chol",
+      "label": "Serum cholesterol",
+      "unit": "mg/dL",
+      "kind": "continuous",
+      "min": 100,
+      "max": 600,
+      "editable": true,
+      "categories": []
+    },
+    {
+      "name": "fbs",
+      "label": "Fasting blood sugar above 120 mg/dL (1 = yes)",
+      "unit": "",
+      "kind": "binary",
+      "min": 0,
+      "max": 1,
+      "editable": false,
+      "categories": []
+    },
+    {
+      "name": "restecg",
+      "label": "Resting ECG result (0 normal, 1 ST-T abnormality, 2 LV hypertrophy)",
+      "unit": "",
+      "kind": "categorical",
+      "min": 0,
+      "max": 2,
+      "editable": false,
+      "categories": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "thalach",
+      "label": "Maximum heart rate achieved in stress test",
+      "unit": "bpm",
+      "kind": "continuous",
+      "min": 60,
+      "max": 220,
+      "editable": false,
+      "categories": []
+    },
+    {
+      "name": "exang",
+      "label": "Exercise-induced angina (1 = yes)",
+      "unit": "",
+      "kind": "binary",
+      "min": 0,
+      "max": 1,
+      "editable": false,
+      "categories": []
+    },
+    {
+      "name": "oldpeak",
+      "label": "ST depression induced by exercise",
+      "unit": "mm",
+      "kind": "continuous",
+      "min": 0,
+      "max": 7,
+      "editable": false,
+      "categories": []
+    }
+  ]
+}

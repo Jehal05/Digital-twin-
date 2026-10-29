@@ -57,11 +57,29 @@ def test_explicit_values_override_measurements(user):
     assert r.json()["input_snapshot"]["glucose"] == 150.0
 
 
-def test_heart_model_unavailable_gives_clear_503_until_trained(client, user):
-    if "heart_disease" in client.app.state.registry.models:  # trained in a later phase
-        return
+def test_heart_model_unavailable_gives_clear_503_when_not_loaded(client, user):
+    client.app.state.registry.models.pop("heart_disease", None)
     r = user.post("/predictions/heart-disease", {"features": {"age": 50}})
     assert r.status_code == 503 and r.json()["error"]["code"] == "model_unavailable"
+
+
+HEART = {"age": 58, "sex": 1, "cp": 4, "trestbps": 140, "chol": 240, "fbs": 0, "restecg": 0,
+         "thalach": 120, "exang": 1, "oldpeak": 2.0}
+
+
+def test_heart_estimate_comes_from_the_trained_model_and_is_labelled(client, user):
+    assert "heart_disease" in client.app.state.registry.models
+    r = user.post("/predictions/heart-disease", {"features": HEART})
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert 0 <= body["score"] <= 1 and body["condition"] == "heart_disease"
+    low = user.post("/predictions/heart-disease", {"features": {**HEART, "age": 35, "sex": 0, "cp": 2, "exang": 0, "oldpeak": 0.0, "thalach": 180}}).json()
+    assert low["score"] < body["score"]
+
+
+def test_heart_rejects_out_of_range_values(user):
+    r = user.post("/predictions/heart-disease", {"features": {**HEART, "chol": 9000}})
+    assert r.status_code == 422
 
 
 def test_history_lists_real_estimates_and_one_can_be_fetched(user, baseline):
@@ -77,15 +95,15 @@ def test_model_versions_are_synced_to_the_database(client):
     from app.models.tables import ModelVersion
     with client.app.state.sessionmaker() as db:
         rows = db.scalars(select(ModelVersion)).all()
-    assert [(r.condition, r.version, r.is_active) for r in rows] == [("diabetes", "1.0.0", True)]
-    assert "sha256" in rows[0].dataset_ref and rows[0].metrics["primary_algorithm"] == "logistic_regression"
+    assert [(r.condition, r.version, r.is_active) for r in rows] == [("diabetes", "1.0.0", True), ("heart_disease", "1.0.0", True)]
+    assert all("sha256" in r.dataset_ref and r.metrics["primary_algorithm"] == "logistic_regression" for r in rows)
 
 
 def test_evaluation_endpoint_serves_metrics_without_internal_split_indices(user):
     r = user.get("/models/evaluation").json()
-    item = r["items"][0]
-    assert item["condition"] == "diabetes" and "test_index" not in item["metrics"]["split"]
-    assert "Limitations" in item["model_card_markdown"] and "heart_disease" in r["unavailable"]
+    assert {i["condition"] for i in r["items"]} == {"diabetes", "heart_disease"} and r["unavailable"] == []
+    for item in r["items"]:
+        assert "test_index" not in item["metrics"]["split"] and "Limitations" in item["model_card_markdown"]
 
 
 def test_cohort_percentile_is_labelled_as_cohort_only(user):

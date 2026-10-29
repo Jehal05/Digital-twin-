@@ -1,6 +1,6 @@
 # HealthTwin: AI-Powered Personal Health Risk Simulator
 
-Keep your health history in one place, get a diabetes risk estimate from a trained model, see why (SHAP), and explore "what if" changes.
+Keep your health history in one place, get diabetes and heart disease estimates from trained models, see why (SHAP), and explore "what if" changes.
 
 > **Experimental model estimates, not diagnoses.** Built on small public datasets, not clinically validated. Not a medical device. In an emergency call your local number (112 in India).
 
@@ -37,7 +37,7 @@ docker compose --env-file deploy/.env up --build   # app on :8080
 Put HTTPS in front (load balancer, Caddy or Traefik). nginx sets a strict CSP and security headers. **The Dockerfiles and compose stack are untested**: the author's environment had no Docker daemon. Production mode itself (`HT_ENV=prod`, migrations, `/healthz`) was run natively on SQLite.
 
 ## Known limitations
-- **Heart model not trained**: needs `ml/data/raw/processed.cleveland.data` (see `ml/README.md`); heart endpoints return 503 until then.
+- **Heart model (v1.0.0)**: trained on the 303-row Cleveland file. It estimates whether artery narrowing is found at angiography, not future risk. Test ROC-AUC is 0.95 but the test set is only 61 rows; cross-validated AUC is 0.85, the more realistic figure. The What-If Simulator and Goal Planner currently support diabetes only.
 - The diabetes model was trained on Pima women aged 21–81; results for others are a demonstration only.
 - Not yet verified: Alembic on PostgreSQL, CI on GitHub, the Anthropic provider against the live API, the service worker and CSP in a real browser.
 - Voice input is not built; Hindi is partial.

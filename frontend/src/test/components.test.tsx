@@ -25,7 +25,7 @@ describe("RiskGauge", () => {
 describe("DiseaseCard", () => {
   it("says honestly when a model is not trained", () => {
     render(<DiseaseCard condition="heart_disease" prediction={null} available={false} active={false} onSelect={() => {}} onRun={() => {}} />);
-    expect(screen.getByText(/not been trained/i)).toBeInTheDocument();
+    expect(screen.getByText(/not available right now/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /get estimate/i })).toBeDisabled();
   });
 });
@@ -85,5 +85,36 @@ describe("AuthPage", () => {
     await userEvent.type(screen.getByLabelText("Password"), "whatever-123456");
     await userEvent.click(screen.getByRole("button", { name: /^sign in$/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Incorrect email or password.");
+  });
+});
+
+describe("EstimateForm for heart disease", () => {
+  it("posts to the heart endpoint with chosen categories and the profile prefill", async () => {
+    const f = vi.fn(async () => json({ ...prediction, condition: "heart_disease" }, 201)); vi.stubGlobal("fetch", f);
+    const d = dashboard(); d.profile = { ...d.profile, age: 58, sex: "male" };
+    const done = vi.fn();
+    render(<EstimateForm condition="heart_disease" data={d} onDone={done} onCancel={() => {}} />);
+    expect(screen.getByRole("form", { name: /heart disease estimate inputs/i })).toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText(/chest pain type/i), "4");
+    await userEvent.type(screen.getByLabelText(/resting systolic/i), "140");
+    await userEvent.type(screen.getByLabelText(/serum cholesterol/i), "240");
+    await userEvent.selectOptions(screen.getByLabelText(/fasting blood sugar/i), "0");
+    await userEvent.selectOptions(screen.getByLabelText(/resting ecg/i), "0");
+    await userEvent.type(screen.getByLabelText(/maximum heart rate/i), "120");
+    await userEvent.selectOptions(screen.getByLabelText(/brought on by exercise/i), "1");
+    await userEvent.type(screen.getByLabelText(/st depression/i), "2");
+    await userEvent.click(screen.getByRole("button", { name: /get estimate/i }));
+    await waitFor(() => expect(done).toHaveBeenCalled());
+    const [url, init] = f.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toContain("/predictions/heart-disease");
+    expect(JSON.parse(init.body as string).features).toMatchObject({ age: 58, sex: 1, cp: 4, trestbps: 140, chol: 240, thalach: 120, exang: 1, oldpeak: 2 });
+  });
+
+  it("asks for a choice instead of guessing a category", async () => {
+    const f = vi.fn(); vi.stubGlobal("fetch", f);
+    render(<EstimateForm condition="heart_disease" data={dashboard()} onDone={() => {}} onCancel={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /get estimate/i }));
+    expect((await screen.findAllByText(/choose an option/i)).length).toBeGreaterThan(0);
+    expect(f).not.toHaveBeenCalled();
   });
 });

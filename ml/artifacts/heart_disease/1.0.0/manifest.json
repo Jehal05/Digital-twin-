@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "trained_at": "2026-10-29T11:44:54+00:00",
+  "seed": 42,
+  "test_size": 0.2,
+  "cv_folds": 5,
+  "fast_mode": false,
+  "dependencies": {
+    "python": "3.13.18",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "shap": "0.54.1"
+  },
+  "dataset": {
+    "file": "processed.cleveland.data",
+    "sha256": "e4757dbc7a995f28d65e9f40ec2b5ecc87cf4a56a85bf7e01eb89fbdb61d9c96",
+    "rows": 303,
+    "positives": 139,
+    "positive_rate": 0.4587,
+    "missing_values": {
+      "ca": 4,
+      "thal": 2
+    },
+    "duplicate_rows": 0
+  },
+  "intended_use": "Educational and research demonstration of how a simple model's estimate changes with its inputs. NOT a medical device. Not for diagnosis, screening, treatment decisions or any clinical use."
+}

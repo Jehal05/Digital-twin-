@@ -11,7 +11,7 @@ import { EmptyState, ErrorState, Skeleton } from "../components/ui/States";
 import { Button } from "../components/ui/Button";
 
 const SHORT: Record<string, string> = { glucose: "Glucose", bmi: "BMI", blood_pressure: "Diastolic BP", age: "Age", pregnancies: "Pregnancies" };
-const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: [] };
+const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: ["age", "trestbps", "chol", "thalach", "oldpeak"] };
 
 function Cohort({ condition, snapshot }: { condition: Condition; snapshot: Record<string, number> }) {
   const [rows, setRows] = useState<CohortPercentile[] | null>(null);
@@ -39,7 +39,9 @@ function Cohort({ condition, snapshot }: { condition: Condition; snapshot: Recor
           ))}
         </ul>
       )}
-      <p className="mt-3 text-xs text-muted">Position within this study's training group only (women of Pima heritage, 21 to 81). It says nothing about the general population.</p>
+      <p className="mt-3 text-xs text-muted">{condition === "heart_disease"
+          ? "Position within this study's training group only (303 people referred for a heart angiogram at one clinic in Cleveland). It says nothing about the general population."
+          : "Position within this study's training group only (women of Pima heritage, 21 to 81). It says nothing about the general population."}</p>
     </Glass>
   );
 }
@@ -59,7 +61,7 @@ export function RiskDetailPage() {
       ))}
     </nav>
   );
-  if (!available) return <>{tabs}<EmptyState title="Heart disease model not available yet">The model needs the UCI Cleveland dataset to be trained. Nothing is shown here until it is, rather than an invented number.</EmptyState></>;
+  if (!available) return <>{tabs}<EmptyState title="Heart disease model not available">The model could not be loaded on the server. Nothing is shown here rather than an invented number.</EmptyState></>;
   if (!p) return <>{tabs}<EmptyState title="No estimate yet" action={<Link to="/"><Button>Go to dashboard</Button></Link>}>Run your first estimate from the dashboard.</EmptyState></>;
 
   const drivers = p.explanation?.top_drivers ?? [];

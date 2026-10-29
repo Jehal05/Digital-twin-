@@ -29,7 +29,7 @@ export function DashboardPage() {
       <div className="space-y-4">
         {editing ? (
           <Glass className="p-5" aria-label="New estimate"><CardTitle>New {selected === "diabetes" ? "diabetes" : "heart disease"} estimate</CardTitle>
-            <EstimateForm data={data} onDone={(p) => void done(p)} onCancel={() => setEditing(false)} /></Glass>
+            <EstimateForm condition={selected} data={data} onDone={(p) => void done(p)} onCancel={() => setEditing(false)} /></Glass>
         ) : shown ? <RiskGauge p={shown} />
           : <Glass className="p-5" aria-label="No estimate"><CardTitle>{selected === "diabetes" ? "Diabetes" : "Heart disease"} estimate</CardTitle>
             <p className="text-sm text-muted">No estimate yet. Use "Get estimate" on the card to the right.</p></Glass>}
