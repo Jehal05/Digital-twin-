@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     ml_dir: Path = REPO_ROOT / "ml"
     cors_origins: list[str] = ["http://localhost:5173"]
     auth_rate_limit_per_minute: int = 10
+    anthropic_api_key: str = ""                        # optional; enables free-text answers in the AI explainer
+    anthropic_model: str = "claude-sonnet-5-5"
+    share_rate_limit_per_minute: int = 30
     auto_create_tables: bool = True                    # dev/test convenience; production uses Alembic migrations
 
     def resolved_secret(self) -> str:

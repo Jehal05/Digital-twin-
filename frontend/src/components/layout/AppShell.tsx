@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { useDashboard } from "../../auth/DataContext";
 import { Button } from "../ui/Button";
+import { ExplainerPanel } from "../explainer/ExplainerPanel";
 import { Logo } from "./Logo";
 
 const NAV: { to: string; label: string; soon?: boolean }[] = [
@@ -12,11 +12,12 @@ const NAV: { to: string; label: string; soon?: boolean }[] = [
   { to: "/simulator", label: "Simulator" },
   { to: "/trends", label: "Trends" },
   { to: "/reliability", label: "Model reliability" },
+  { to: "/report", label: "Report" },
 ];
 const STEPS = ["My Health Data", "AI Analysis", "Explain Why", "Simulate Changes", "Track Over Time"];
 
 function stepIndex(path: string, hasData: boolean, hasEstimate: boolean) {
-  if (path.startsWith("/profile")) return 0;
+  if (path.startsWith("/profile") || path.startsWith("/import")) return 0;
   if (path.startsWith("/risk")) return 2;
   if (path.startsWith("/simulator")) return 3;
   if (path.startsWith("/trends")) return 4;
@@ -62,22 +63,6 @@ export function ProgressRail({ current }: { current: number }) {
   );
 }
 
-function AssistantFab() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="fixed bottom-5 right-5 z-20 flex flex-col items-end gap-2">
-      {open && (
-        <div role="dialog" aria-label="AI explainer" className="glass max-w-xs p-4 text-sm">
-          <p className="font-semibold">AI explainer</p>
-          <p className="mt-1 text-muted">Plain-language explanations of your results arrive in a later release. Until then, the "Why the risk?" card shows the model's real drivers.</p>
-        </div>
-      )}
-      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="AI explainer"
-        className="grid h-14 w-14 place-items-center rounded-full bg-brand text-xl text-white shadow-lg hover:bg-[#2249a8]">✦</button>
-    </div>
-  );
-}
-
 export function AppShell() {
   const { logout } = useAuth();
   const { data } = useDashboard();
@@ -87,7 +72,7 @@ export function AppShell() {
   return (
     <div className="mx-auto flex min-h-screen max-w-7xl flex-col gap-4 px-4 py-4 md:px-6">
       <a href="#main" className="sr-only focus:not-sr-only focus:rounded focus:bg-white focus:p-2">Skip to content</a>
-      <header className="glass flex flex-wrap items-center gap-3 px-5 py-3">
+      <header className="glass no-print flex flex-wrap items-center gap-3 px-5 py-3">
         <div className="flex items-center gap-2.5"><Logo /><span className="text-lg font-bold tracking-tight">HealthTwin</span></div>
         <nav aria-label="Main" className="order-3 flex w-full flex-wrap gap-1 md:order-none md:ml-4 md:w-auto">
           {NAV.map((n) => n.soon ? (
@@ -99,16 +84,17 @@ export function AppShell() {
               className={({ isActive }) => `rounded-full px-3 py-1.5 text-sm font-medium ${isActive ? "bg-brand text-white" : "hover:bg-brand-soft"}`}>{n.label}</NavLink>
           ))}
         </nav>
-        <Button variant="secondary" className="ml-auto" onClick={() => void logout()}>Sign out</Button>
+        <NavLink to="/settings" className={({ isActive }) => `ml-auto rounded-full px-3 py-1.5 text-sm font-medium ${isActive ? "bg-brand text-white" : "hover:bg-brand-soft"}`}>Privacy</NavLink>
+        <Button variant="secondary" onClick={() => void logout()}>Sign out</Button>
       </header>
-      <SummaryBar />
-      <ProgressRail current={stepIndex(loc.pathname, hasData, hasEstimate)} />
+      <div className="no-print"><SummaryBar /></div>
+      <div className="no-print"><ProgressRail current={stepIndex(loc.pathname, hasData, hasEstimate)} /></div>
       <main id="main" className="flex-1" tabIndex={-1}><Outlet /></main>
       <footer className="pb-16 text-xs text-muted">
         <p>HealthTwin is an educational project. Estimates come from models trained on small public research datasets and are not medical advice or a diagnosis.</p>
         <p className="mt-1 font-medium text-ink">If you have chest pain, trouble breathing, fainting or other urgent symptoms, contact emergency services now.</p>
       </footer>
-      <AssistantFab />
+      <ExplainerPanel />
     </div>
   );
 }

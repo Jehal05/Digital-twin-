@@ -12,7 +12,8 @@ A web app that keeps a person's health history, estimates diabetes and heart dis
 | 3 | FastAPI backend (auth, measurements, predictions, scenarios, Goal Planner, privacy) | Done: 61 tests, see `backend/README.md`. Heart endpoints return 503 until the heart model is trained. |
 | 4 | Design system, sign-in, profile and readings, dashboard (gauge, Why, Digital Twin, disease cards) | Done (23 frontend tests) |
 | 5 | Risk details (SHAP walk, cohort percentile), What-If Simulator, Goal Planner, scenario comparison, Trends + Time Machine, Model Reliability | Done (27 frontend tests) |
-| 6-7 | Lab OCR, wearable CSV, AI explainer, doctor report, privacy UI, polish, deployment | Not started |
+| 6 | Lab-report OCR with review, wearable CSV import, grounded AI explainer, doctor report + share links, privacy settings (export, consent, delete) | Done (88 backend, 38 frontend tests) |
+| 7 | Dark mode, Hindi, PWA, command palette, accessibility audit, README/deploy | Not started |
 
 ## Layout
 `frontend/` React + TypeScript + Tailwind (dashboard working; run `npm run dev`, API on :8000) · `backend/` FastAPI (working) · `ml/` training, evaluation, inference (working) · `docs/` design and API contract · `e2e/` · `scripts/`

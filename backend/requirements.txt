@@ -9,8 +9,13 @@ email-validator
 PyJWT
 argon2-cffi
 psycopg[binary]      # PostgreSQL driver (production); not needed for SQLite dev/tests
+python-multipart     # file uploads (CSV, lab reports)
+pillow
+pdfplumber
+pytesseract           # needs the tesseract-ocr system package; without it lab-report OCR reports "not available"
 # ML package used for inference (see ../ml/requirements.txt)
 -r ../ml/requirements.txt
 # Tests
 httpx
 pytest
+reportlab

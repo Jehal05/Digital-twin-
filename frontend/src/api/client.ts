@@ -42,11 +42,12 @@ async function toError(res: Response): Promise<ApiError> {
 
 async function request<T>(method: string, path: string, body?: unknown, retry = true): Promise<T> {
   const headers: Record<string, string> = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !isForm) headers["Content-Type"] = "application/json";
   if (session.access) headers.Authorization = `Bearer ${session.access}`;
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    res = await fetch(`${BASE}${path}`, { method, headers, body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body) });
   } catch {
     throw new ApiError(0, "network", "Can't reach the server. Check your connection and try again.");
   }
@@ -62,5 +63,14 @@ export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body ?? {}),
   put: <T>(path: string, body: unknown) => request<T>("PUT", path, body),
-  del: <T = void>(path: string) => request<T>("DELETE", path),
+  del: <T = void>(path: string, body?: unknown) => request<T>("DELETE", path, body),
+  upload: <T>(path: string, file: File) => { const f = new FormData(); f.append("file", file); return request<T>("POST", path, f); },
+  /** Authenticated download (an <a href> cannot send the bearer token). */
+  download: async (path: string): Promise<Blob> => {
+    const call = () => fetch(`${BASE}${path}`, { headers: session.access ? { Authorization: `Bearer ${session.access}` } : {} });
+    let res = await call();
+    if (res.status === 401 && session.refresh && (await refreshSession())) res = await call();
+    if (!res.ok) throw await toError(res);
+    return res.blob();
+  },
 };

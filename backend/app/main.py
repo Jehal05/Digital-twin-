@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
-from app.api.v1 import auth, insights, measurements, predictions, privacy, profile, scenarios
+from app.api.v1 import auth, explain, imports, insights, measurements, predictions, privacy, profile, reports, scenarios
 from app.core.config import Settings, get_settings
 from app.core.db import Base, make_engine, make_sessionmaker
 from app.core.errors import install_error_handlers
@@ -36,6 +36,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.sessionmaker = make_sessionmaker(app.state.engine)
     app.state.registry = ModelRegistry(settings.ml_dir)
     app.state.auth_limiter = RateLimiter(settings.auth_rate_limit_per_minute)
+    app.state.share_limiter = RateLimiter(settings.share_rate_limit_per_minute)
 
     install_error_handlers(app)
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=False,
@@ -51,7 +52,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return response
 
     for router in (auth.router, profile.router, measurements.router, predictions.router, scenarios.router, insights.router,
-                   privacy.router):
+                   privacy.router, imports.router, explain.router, reports.router):
         app.include_router(router, prefix="/api/v1")
 
     @app.get("/healthz", tags=["ops"])

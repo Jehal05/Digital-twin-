@@ -13,7 +13,7 @@ from app.core.errors import ApiError
 from app.core.security import audit, current_user, verify_password
 from app.models.tables import (AuditEvent, Consent, ExplainerMessage, HealthMeasurement, HealthProfile, Prediction, RefreshToken,
                                ShareLink, SimulationScenario, UploadedFile, User, UserPreference)
-from app.schemas.api import DeleteAccountIn
+from app.schemas.api import ConsentIn, DeleteAccountIn
 from app.services.predictions import iso
 
 router = APIRouter(prefix="/privacy", tags=["privacy"])
@@ -63,3 +63,22 @@ def delete_account(body: DeleteAccountIn, request: Request, user: User = Depends
     audit(db, request, "account_deleted", None)  # anonymous record that a deletion happened; no user reference
     db.commit()
     return {"status": "deleted", "note": "Your account and health data have been permanently removed."}
+
+
+@router.get("/consents")
+def consents(request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Latest decision per consent type, plus the full append-only history."""
+    rows = db.scalars(select(Consent).where(Consent.user_id == user.id).order_by(Consent.recorded_at, Consent.id)).all()
+    latest = {r.consent_type: {"granted": r.granted, "recorded_at": iso(r.recorded_at), "policy_version": r.policy_version} for r in rows}
+    from app.api.v1.explain import provider_for
+    return {"current": latest, "history_count": len(rows), "ai_explainer_available": provider_for(request) is not None}
+
+
+@router.post("/consents", status_code=201)
+def set_consent(body: ConsentIn, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Consent changes are appended, never edited, so there is a record of what was agreed and when."""
+    db.add(Consent(user_id=user.id, consent_type=body.consent_type, granted=body.granted,
+                   policy_version=request.app.state.settings.policy_version))
+    audit(db, request, "consent_changed", user.id, {"type": body.consent_type, "granted": body.granted})
+    db.commit()
+    return {"consent_type": body.consent_type, "granted": body.granted}

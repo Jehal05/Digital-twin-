@@ -94,3 +94,32 @@ class PreferencesIn(Strict):
 
 class DeleteAccountIn(Strict):
     password: str = Field(max_length=128)
+
+
+class ImportRow(Strict):
+    measurement_type: str = Field(max_length=32)
+    value: float
+    unit: str = Field(max_length=16)
+    recorded_at: datetime
+    ocr_confidence: float | None = Field(default=None, ge=0, le=1)
+
+
+class CommitIn(Strict):
+    source: Literal["csv", "ocr"]
+    rows: list[ImportRow] = Field(min_length=1, max_length=500)
+
+
+class ExplainIn(Strict):
+    prediction_id: uuid.UUID
+    topic: Literal["summary", "why", "uncertainty", "what_can_change", "about_model"] | None = None
+    question: str | None = Field(default=None, max_length=300)
+
+
+class ShareIn(Strict):
+    expires_in_days: int = Field(default=7, ge=1, le=30)
+    include: list[Literal["profile", "measurements", "estimates"]] = Field(default_factory=lambda: ["measurements", "estimates"], min_length=1)
+
+
+class ConsentIn(Strict):
+    consent_type: Literal["ai_explainer"]
+    granted: bool

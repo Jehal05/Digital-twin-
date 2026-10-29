@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { api, ApiError } from "../api/client";
 import type { Measurement } from "../api/types";
 import { useDashboard } from "../auth/DataContext";
@@ -121,7 +122,7 @@ function Readings() {
 
   return (
     <Glass className="p-5" aria-label="Recent readings">
-      <CardTitle>Recent readings</CardTitle>
+      <CardTitle aside={<Link to="/import" className="text-sm font-semibold text-brand underline">Import a file</Link>}>Recent readings</CardTitle>
       {err && <p role="alert" className="mb-3 text-sm text-high">{err}</p>}
       {flagged.length > 0 && (
         <div className="mb-4 space-y-2" role="region" aria-label="Readings to review">

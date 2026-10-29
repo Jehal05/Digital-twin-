@@ -45,3 +45,17 @@ Ops: `GET /healthz`. All errors use `{"error": {"code", "message", "fields"}}`.
 - Uploads, OCR/CSV import, doctor-visit report, share links, AI explainer and streaks are later phases (tables exist, endpoints do not).
 - Account deletion removes database rows; file-storage cleanup arrives with uploads.
 - Not a security audit. Treat as a well-tested prototype.
+
+
+## Phase 6 additions
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /imports/csv/preview`, `POST /imports/lab-report/preview` | Parse and validate only; nothing is saved. Lab files are read in memory and discarded. |
+| `POST /imports/commit` | Saves rows the user reviewed (`source`: `csv` or `ocr`); duplicates skipped, bad rows reported. |
+| `POST /explain` | Explains a stored estimate. Template answers always work; free text needs a provider and the user's consent. |
+| `GET /report`, `POST/GET/DELETE /share`, `GET /shared/{token}` | Doctor visit summary and revocable read-only links (token shown once, only its hash is stored). |
+| `GET/POST /privacy/consents` | Append-only consent history. |
+
+Optional settings: `HT_ANTHROPIC_API_KEY`, `HT_ANTHROPIC_MODEL` enable free-text explainer answers. Lab OCR needs the `tesseract-ocr` system package; PDFs with a text layer work without it.
+The Anthropic provider has not been run against the live API (tests use a fake provider).

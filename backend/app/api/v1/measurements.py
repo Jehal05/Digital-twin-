@@ -32,7 +32,8 @@ def _previous(db: Session, user_id, mtype: str, before: datetime):
     return (m.value, m.recorded_at) if m else None
 
 
-def _create(db: Session, user: User, body_type: str, value: float, unit: str, recorded_at: datetime) -> HealthMeasurement:
+def _create(db: Session, user: User, body_type: str, value: float, unit: str, recorded_at: datetime, source: str = "manual",
+            ocr_confidence: float | None = None) -> HealthMeasurement:
     try:
         canonical = svc.to_canonical(body_type, value, unit)
         svc.check_time(recorded_at, datetime.now(timezone.utc))
@@ -47,8 +48,8 @@ def _create(db: Session, user: User, body_type: str, value: float, unit: str, re
         raise ApiError(409, "duplicate", "This exact reading is already recorded.")
     reason = svc.anomaly_reason(body_type, canonical, recorded_at, _previous(db, user.id, body_type, recorded_at))
     m = HealthMeasurement(user_id=user.id, measurement_type=body_type, value=canonical, unit=svc.CATALOG[body_type].canonical_unit,
-                          recorded_at=recorded_at, source="manual", validation_status="flagged" if reason else "valid",
-                          flag_reason=reason)
+                          recorded_at=recorded_at, source=source, validation_status="flagged" if reason else "valid",
+                          flag_reason=reason, ocr_confidence=ocr_confidence)
     db.add(m)
     return m
 
