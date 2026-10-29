@@ -1,0 +1,62 @@
+{
+  "condition": "diabetes",
+  "version": "1.0.0",
+  "outcome_definition": "Diabetes diagnosis recorded in the dataset (WHO criteria), not future onset.",
+  "population_note": "Training data covers 768 women aged 21-81 of Pima Indian heritage. Estimates for men, other ethnic groups or ages outside 21-81 are outside what the data represents.",
+  "risk_band_edges": [
+    0.2,
+    0.5
+  ],
+  "features": [
+    {
+      "name": "pregnancies",
+      "label": "Pregnancies",
+      "unit": "count",
+      "kind": "integer",
+      "min": 0,
+      "max": 20,
+      "editable": false,
+      "categories": []
+    },
+    {
+      "name": "glucose",
+      "label": "2-hour plasma glucose (oral glucose tolerance test)",
+      "unit": "mg/dL",
+      "kind": "continuous",
+      "min": 40,
+      "max": 400,
+      "editable": true,
+      "categories": []
+    },
+    {
+      "name": "blood_pressure",
+      "label": "Diastolic blood pressure",
+      "unit": "mmHg",
+      "kind": "continuous",
+      "min": 30,
+      "max": 130,
+      "editable": true,
+      "categories": []
+    },
+    {
+      "name": "bmi",
+      "label": "Body mass index",
+      "unit": "kg/m2",
+      "kind": "continuous",
+      "min": 12,
+      "max": 70,
+      "editable": true,
+      "categories": []
+    },
+    {
+      "name": "age",
+      "label": "Age",
+      "unit": "years",
+      "kind": "integer",
+      "min": 18,
+      "max": 100,
+      "editable": false,
+      "categories": []
+    }
+  ]
+}
