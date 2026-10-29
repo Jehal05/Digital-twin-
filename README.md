@@ -23,8 +23,8 @@ alembic upgrade head && uvicorn app.main:create_app --factory --reload
 # frontend (:5173)
 cd frontend && npm ci && npm run dev
 ```
-Tests: `cd backend && python -m pytest -q` · `cd ml && python -m pytest -q` · `cd frontend && npx tsc --noEmit && npx vitest run`.
-OCR needs the `tesseract-ocr` system package.
+Tests: `python e2e/smoke.py` (browser walkthrough; needs the API and `BASE_URL`) · `cd backend && python -m pytest -q` · `cd ml && python -m pytest -q` · `cd frontend && npx tsc --noEmit && npx vitest run`.
+OCR needs the `tesseract-ocr` system package. Run the backend suite on PostgreSQL with `HT_TEST_DATABASE_URL=postgresql+psycopg://user:pw@host/db python -m pytest`.
 
 ## Architecture
 `ml/` training, calibration, SHAP, inference, versioned artifacts and model cards → `backend/` FastAPI + SQLAlchemy + Alembic (JWT with rotating refresh tokens, argon2, rate limits, audit log without health values, append-only measurements) → `frontend/` React 18 + TypeScript + Tailwind v4. Design and API contract: `docs/PHASE1.md`.
@@ -34,12 +34,12 @@ OCR needs the `tesseract-ocr` system package.
 cp deploy/.env.example deploy/.env   # set POSTGRES_PASSWORD and HT_SECRET_KEY (32+ chars)
 docker compose --env-file deploy/.env up --build   # app on :8080
 ```
-Put HTTPS in front (load balancer, Caddy or Traefik). nginx sets a strict CSP and security headers. **The Dockerfiles and compose stack are untested**: the author's environment had no Docker daemon. Production mode itself (`HT_ENV=prod`, migrations, `/healthz`) was run natively on SQLite.
+Put HTTPS in front (load balancer, Caddy or Traefik). nginx sets a strict CSP and security headers. **The container images themselves have not been built yet**: the build environment could not reach any image registry. CI builds and starts them on GitHub (`docker` job). What was verified without Docker: a clean install from `backend/requirements.txt` + `constraints.txt` (93 tests pass), the exact container start command as a non-root user against PostgreSQL 16, and the real `deploy/nginx.conf` serving the built frontend in a real browser (see `e2e/smoke.py`).
 
 ## Known limitations
 - **Heart model (v1.0.0)**: trained on the 303-row Cleveland file. It estimates whether artery narrowing is found at angiography, not future risk. Test ROC-AUC is 0.95 but the test set is only 61 rows; cross-validated AUC is 0.85, the more realistic figure. The What-If Simulator and Goal Planner work for both conditions; for heart only blood pressure and cholesterol can be changed.
 - The diabetes model was trained on Pima women aged 21–81; results for others are a demonstration only.
-- Not yet verified: Alembic on PostgreSQL, CI on GitHub, the Anthropic provider against the live API, the service worker and CSP in a real browser.
+- Not yet verified: CI on GitHub, building the Docker images, the Anthropic provider against the live API. Verified: Alembic and the full backend suite on PostgreSQL 16; the service worker (offline shell) and the strict CSP in a real browser.
 - Voice input is not built; Hindi is partial.
 
 ## Status

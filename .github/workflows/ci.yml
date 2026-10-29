@@ -8,20 +8,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12", cache: pip }
+        with: { python-version: "3.13", cache: pip }
       - run: pip install -r ml/requirements.txt
       - run: python -m pytest -q
         working-directory: ml
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: healthtwin, POSTGRES_PASSWORD: pw, POSTGRES_DB: healthtwin }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U healthtwin" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12", cache: pip }
+        with: { python-version: "3.13", cache: pip }
       - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
-      - run: pip install -r backend/requirements.txt
+      - run: pip install -r backend/requirements.txt -c backend/constraints.txt
       - run: python -m pytest -q
         working-directory: backend
+      - name: Full suite again on PostgreSQL
+        working-directory: backend
+        env: { HT_TEST_DATABASE_URL: "postgresql+psycopg://healthtwin:pw@localhost:5432/healthtwin" }
+        run: python -m pytest -q
+      - name: Migration on PostgreSQL (upgrade, drift check, downgrade, upgrade)
+        working-directory: backend
+        env: { HT_DATABASE_URL: "postgresql+psycopg://healthtwin:pw@localhost:5432/healthtwin" }
+        run: alembic upgrade head && alembic check && alembic downgrade base && alembic upgrade head
       - name: Migration upgrade, drift check, downgrade (SQLite)
         working-directory: backend
         env: { HT_DATABASE_URL: "sqlite:///./ci.db" }
@@ -40,3 +55,20 @@ jobs:
         working-directory: frontend
       - run: npm run build
         working-directory: frontend
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build both images
+        run: |
+          printf 'POSTGRES_PASSWORD=ci\nHT_SECRET_KEY=%s\n' "$(python3 -c 'import secrets;print(secrets.token_urlsafe(48))')" > deploy/.env
+          docker compose --env-file deploy/.env build
+      - name: Start the stack and check it
+        run: |
+          docker compose --env-file deploy/.env up -d
+          for i in $(seq 1 40); do curl -fs localhost:8080/healthz && break; sleep 3; done
+          curl -fsI localhost:8080/ | grep -i content-security-policy
+          curl -fs localhost:8080/healthz | grep '"heart_disease"'
+      - if: failure()
+        run: docker compose --env-file deploy/.env logs
