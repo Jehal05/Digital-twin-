@@ -1,0 +1,31 @@
+import type { RiskBand } from "../api/types";
+
+export const pct = (p: number, digits = 0) => `${(p * 100).toFixed(digits)}%`;
+export const points = (effect: number) => `${effect >= 0 ? "+" : "−"}${Math.abs(effect * 100).toFixed(1)} pts`;
+
+export const BAND_LABEL: Record<RiskBand, string> = { low: "Lower estimate", moderate: "Moderate estimate", high: "Higher estimate" };
+export const BAND_TEXT: Record<RiskBand, string> = { low: "text-low", moderate: "text-moderate", high: "text-high" };
+export const BAND_CHIP: Record<RiskBand, string> = { low: "bg-low-bg text-low", moderate: "bg-moderate-bg text-moderate", high: "bg-high-bg text-high" };
+
+export const MEASUREMENT_LABEL: Record<string, string> = {
+  weight_kg: "Weight", height_cm: "Height", bmi: "BMI", glucose_mgdl: "Glucose", bp_systolic: "Systolic BP",
+  bp_diastolic: "Diastolic BP", cholesterol_mgdl: "Cholesterol", heart_rate_max: "Max heart rate", resting_hr: "Resting heart rate",
+  steps: "Steps", sleep_hours: "Sleep",
+};
+
+/** Mirrors backend/app/services/measurements.py. The server stays the authority; this only drives the form. */
+export const MEASUREMENT_UNITS: Record<string, string[]> = {
+  weight_kg: ["kg", "lb"], height_cm: ["cm", "in", "m"], bmi: ["kg/m2"], glucose_mgdl: ["mg/dL", "mmol/L"],
+  bp_systolic: ["mmHg"], bp_diastolic: ["mmHg"], cholesterol_mgdl: ["mg/dL", "mmol/L"], heart_rate_max: ["bpm"],
+  resting_hr: ["bpm"], steps: ["count"], sleep_hours: ["h"],
+};
+
+export function timeAgo(iso: string, now = Date.now()): string {
+  const s = Math.max(0, (now - new Date(iso).getTime()) / 1000);
+  if (s < 90) return "just now";
+  if (s < 3600) return `${Math.round(s / 60)} min ago`;
+  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+  if (s < 86400 * 30) return `${Math.round(s / 86400)} d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+export const shortDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
