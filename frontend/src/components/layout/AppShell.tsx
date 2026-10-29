@@ -8,14 +8,19 @@ import { Logo } from "./Logo";
 const NAV: { to: string; label: string; soon?: boolean }[] = [
   { to: "/", label: "Dashboard" },
   { to: "/profile", label: "My data" },
-  { to: "/simulator", label: "Simulator", soon: true },
-  { to: "/trends", label: "Trends", soon: true },
-  { to: "/reliability", label: "Model reliability", soon: true },
+  { to: "/risk/diabetes", label: "Risk details" },
+  { to: "/simulator", label: "Simulator" },
+  { to: "/trends", label: "Trends" },
+  { to: "/reliability", label: "Model reliability" },
 ];
 const STEPS = ["My Health Data", "AI Analysis", "Explain Why", "Simulate Changes", "Track Over Time"];
 
 function stepIndex(path: string, hasData: boolean, hasEstimate: boolean) {
   if (path.startsWith("/profile")) return 0;
+  if (path.startsWith("/risk")) return 2;
+  if (path.startsWith("/simulator")) return 3;
+  if (path.startsWith("/trends")) return 4;
+  if (path.startsWith("/reliability")) return 1;
   if (hasEstimate) return 2;
   return hasData ? 1 : 0;
 }
