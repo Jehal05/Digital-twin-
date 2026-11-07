@@ -11,3 +11,7 @@ dist/
 
 deploy/.env
 *.db
+
+# Large survey dataset (22 MB): download it, do not commit. See ml/README.md
+ml/data/raw/brfss/
+ml/reports/survey_oof.npz

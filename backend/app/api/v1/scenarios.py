@@ -93,7 +93,7 @@ def goal_plan(body: GoalPlanIn, request: Request, user: User = Depends(current_u
 
 
 @router.get("")
-def list_(request: Request, condition: str | None = Query(None, pattern="^(diabetes|heart_disease)$"),
+def list_(request: Request, condition: str | None = Query(None, pattern="^(diabetes|heart_disease|diabetes_survey)$"),
           user: User = Depends(current_user), db: Session = Depends(get_db)):
     q = select(SimulationScenario).where(SimulationScenario.user_id == user.id)
     if condition:

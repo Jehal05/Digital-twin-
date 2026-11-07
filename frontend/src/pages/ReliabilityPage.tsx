@@ -5,7 +5,8 @@ import { HBars, LineChart } from "../components/charts/Charts";
 import { CardTitle, Glass } from "../components/ui/Glass";
 import { EmptyState, ErrorState, Skeleton } from "../components/ui/States";
 
-const NAME: Record<string, string> = { logistic_regression: "Logistic regression", random_forest: "Random forest" };
+const NAME: Record<string, string> = { logistic_regression: "Logistic regression", random_forest: "Random forest", hist_gradient_boosting: "Gradient boosting", neural_network: "Small neural network" };
+const TITLE: Record<Condition, string> = { diabetes: "Diabetes", diabetes_survey: "Diabetes (lifestyle survey)", heart_disease: "Heart disease" };
 const f3 = (n: number) => n.toFixed(3);
 
 function Metrics({ item }: { item: EvalItem }) {
@@ -21,14 +22,41 @@ function Metrics({ item }: { item: EvalItem }) {
         </dl>
       </Glass>
 
+      {m.nested_cv ? (
+        <Glass className="p-5 lg:col-span-2" aria-label="Model comparison">
+          <CardTitle>{Object.keys(m.nested_cv).length} models, one rule</CardTitle>
+          <p className="mb-3 text-sm text-muted">{m.selection_rule} Primary model: <strong>{NAME[m.primary_algorithm]}</strong>. {m.nested_cv_design?.outer} {m.nested_cv_design?.inner} Scores are the mean ± spread over the outer folds, so every row was predicted by a model that never saw it.</p>
+          <div className="overflow-x-auto"><table className="w-full text-left text-sm"><caption className="sr-only">Nested cross-validation results by model</caption>
+            <thead><tr className="text-xs text-muted"><th className="py-1">Model</th><th>ROC-AUC</th><th>Brier</th><th>Calib. error</th><th>AUC vs logistic</th></tr></thead>
+            <tbody>{Object.entries(m.nested_cv).map(([k, v]) => (<tr key={k} className="border-t border-line"><td className="py-1.5 font-medium">{NAME[k] ?? k}{k === m.primary_algorithm ? " ★" : ""}</td>
+              <td className="num">{f3(v.roc_auc.mean)} ± {f3(v.roc_auc.std)}</td><td className="num">{f3(v.brier.mean)}</td><td className="num">{f3(v.ece.mean)}</td>
+              <td className="num">{k === "logistic_regression" ? "baseline" : `${v.auc_gain_vs_logistic.mean >= 0 ? "+" : ""}${f3(v.auc_gain_vs_logistic.mean)} (better in ${v.auc_gain_vs_logistic.folds_better}/${v.auc_gain_vs_logistic.folds} folds)`}</td></tr>))}</tbody></table></div>
+          <p className="mt-2 text-xs text-muted">★ primary. AUC: 0.5 is a coin flip, 1.0 is perfect. Brier and calibration error: lower is better. A complex model is only kept when it beats the simple one by a clear margin.</p>
+        </Glass>
+      ) : (
       <Glass className="p-5" aria-label="Model comparison">
         <CardTitle>Two models, one rule</CardTitle>
         <p className="mb-3 text-sm text-muted">{m.selection_rule} Primary model: <strong>{NAME[m.primary_algorithm]}</strong>. Scores are on {m.split.test_rows} held-out rows, so small differences are noise.</p>
         <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="text-xs text-muted"><th className="py-1">Model</th><th>CV AUC</th><th>Test AUC</th><th>Brier</th><th>Calib. gap</th></tr></thead>
-          <tbody>{Object.entries(m.models).map(([k, v]) => (<tr key={k} className="border-t border-line"><td className="py-1.5 font-medium">{NAME[k]}{v.is_primary ? " ★" : ""}</td>
+          <tbody>{Object.entries(m.models).map(([k, v]) => (<tr key={k} className="border-t border-line"><td className="py-1.5 font-medium">{NAME[k] ?? k}{v.is_primary ? " ★" : ""}</td>
             <td className="num">{f3(v.cv_roc_auc_train)} ± {f3(v.cv_roc_auc_std)}</td><td className="num">{f3(v.test.roc_auc)}</td><td className="num">{f3(v.test.brier_score)}</td><td className="num">{f3(v.test.calibration_gap.mean_abs)}</td></tr>))}</tbody></table></div>
         <p className="mt-2 text-xs text-muted">★ primary. AUC: 0.5 is a coin flip, 1.0 is perfect. Brier and calibration gap: lower is better.</p>
-      </Glass>
+      </Glass>)}
+
+      {(m.subgroup_roc_auc || m.external_validation?.leave_one_hospital_out) && (
+        <Glass className="p-5 lg:col-span-2" aria-label="Fairness and external validation">
+          <CardTitle>Who is it less reliable for?</CardTitle>
+          {m.subgroup_roc_auc && (<>
+            <p className="mb-2 text-sm text-muted">ROC-AUC within each group, from out-of-fold predictions. A lower number means the estimate is less trustworthy for that group.</p>
+            <ul className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">{Object.entries(m.subgroup_roc_auc).map(([g, r]) => (
+              <li key={g} className="panel-dim p-2"><span className="font-semibold">{g.replace(/_/g, " ")}</span> <span className="num">AUC {f3(r.roc_auc)}</span><span className="block text-xs text-muted">{r.n.toLocaleString()} predictions, {pct1(r.positive_rate)} with the outcome</span></li>))}</ul></>)}
+          {m.external_validation?.leave_one_hospital_out && (<>
+            <p className="mb-2 mt-4 text-sm text-muted">Train on three hospitals, test on the fourth (ROC-AUC, {NAME[m.primary_algorithm]}). This is the closest thing here to "does it work somewhere new?"</p>
+            <div className="overflow-x-auto"><table className="w-full text-left text-sm"><caption className="sr-only">Leave-one-hospital-out results</caption>
+              <thead><tr className="text-xs text-muted"><th className="py-1">Held-out hospital</th><th>Patients</th><th>Disease rate</th><th>AUC</th></tr></thead>
+              <tbody>{Object.entries(m.external_validation.leave_one_hospital_out).map(([h, r]) => (<tr key={h} className="border-t border-line"><td className="py-1.5 font-medium capitalize">{h}</td>
+                <td className="num">{r.n}</td><td className="num">{pct1(r.positive_rate)}</td><td className="num">{f3(r.roc_auc[m.primary_algorithm])}</td></tr>))}</tbody></table></div></>)}
+        </Glass>)}
 
       <Glass className="p-5" aria-label="Errors at the operating threshold">
         <CardTitle>What the mistakes look like</CardTitle>
@@ -85,8 +113,8 @@ export function ReliabilityPage() {
     <div className="space-y-4">
       <Glass className="p-5"><h1 className="text-2xl font-bold tracking-tight">Model reliability</h1>
         <p className="mt-1 text-sm text-muted">Everything here was measured on public research datasets, not on you. These are experimental estimates, not diagnoses.</p></Glass>
-      {items.map((it) => <section key={it.condition} aria-label={`${it.condition} evaluation`}><h2 className="mb-2 inline-block rounded-full bg-card/80 px-4 py-1 text-lg font-semibold">{it.condition === "diabetes" ? "Diabetes" : "Heart disease"} <span className="text-sm font-normal text-muted">v{it.version}</span></h2><Metrics item={it} /></section>)}
-      {missing.map((c) => <EmptyState key={c} title={`${c === "diabetes" ? "Diabetes" : "Heart disease"} model not trained`}>No evaluation is shown because there is no model yet.</EmptyState>)}
+      {items.map((it) => <section key={it.condition} aria-label={`${it.condition} evaluation`}><h2 className="mb-2 inline-block rounded-full bg-card/80 px-4 py-1 text-lg font-semibold">{TITLE[it.condition]} <span className="text-sm font-normal text-muted">v{it.version}</span></h2><Metrics item={it} /></section>)}
+      {missing.map((c) => <EmptyState key={c} title={`${TITLE[c]} model not trained`}>No evaluation is shown because there is no model yet.</EmptyState>)}
     </div>
   );
 }

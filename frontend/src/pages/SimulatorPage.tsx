@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { api, ApiError } from "../api/client";
 import type { Condition, GoalPlan, Prediction, Scenario } from "../api/types";
 import { useDashboard } from "../auth/DataContext";
-import { DIABETES_FIELDS, HEART_FIELDS } from "../components/dashboard/EstimateForm";
+import { DIABETES_FIELDS, HEART_FIELDS, SURVEY_FIELDS } from "../components/dashboard/EstimateForm";
 import { Button } from "../components/ui/Button";
 import { ContentTag, ExperimentalNote } from "../components/ui/ContentTag";
 import { CardTitle, Glass } from "../components/ui/Glass";
@@ -16,6 +16,9 @@ const CONFIG = {
     editable: ["glucose", "blood_pressure", "bmi"], fixed: ["age", "pregnancies"] },
   heart_disease: { name: "Heart disease", fields: HEART_FIELDS as readonly { name: string; label: string; unit: string; min: number; max: number; step: number }[],
     editable: ["trestbps", "chol"], fixed: ["age", "sex", "cp", "fbs", "restecg", "thalach", "exang", "oldpeak"] },
+  diabetes_survey: { name: "Diabetes (lifestyle survey)", fields: SURVEY_FIELDS as readonly { name: string; label: string; unit: string; min: number; max: number; step: number }[],
+    editable: ["bmi", "smoker", "physical_activity", "fruit_daily", "veg_daily", "heavy_alcohol"],
+    fixed: ["age_band", "sex", "high_bp", "high_chol", "stroke", "heart_disease_or_attack", "general_health", "mental_health_days", "physical_health_days", "difficulty_walking"] },
 } as const;
 
 const signed = (pp: number) => `${pp > 0 ? "+" : pp < 0 ? "−" : ""}${Math.abs(pp).toFixed(1)} pts`;
@@ -103,6 +106,15 @@ export function SimulatorPage() {
           {EDITABLE.map((name) => {
             const f = cfg.fields.find((x) => x.name === name)!;
             const b = base.input_snapshot[name], v = vals[name] ?? b;
+            if (f.min === 0 && f.max === 1) return (
+              <div key={name} className="flex items-center justify-between gap-3">
+                <label htmlFor={`sl-${name}`} className="text-sm font-medium">{f.label}</label>
+                <select id={`sl-${name}`} value={String(v)} onChange={(e) => setVals({ ...vals, [name]: Number(e.target.value) })}
+                  className="min-h-9 rounded-lg border border-line bg-card px-2 text-sm">
+                  <option value="0">No{b === 0 ? " (baseline)" : ""}</option><option value="1">Yes{b === 1 ? " (baseline)" : ""}</option>
+                </select>
+              </div>
+            );
             return (
               <div key={name}>
                 <div className="flex items-baseline justify-between"><label htmlFor={`sl-${name}`} className="text-sm font-medium">{f.label}</label>

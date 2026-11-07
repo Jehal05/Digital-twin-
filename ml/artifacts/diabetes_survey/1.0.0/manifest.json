@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "trained_at": "2026-11-07T09:52:20+00:00",
+  "seed": 42,
+  "dependencies": {
+    "python": "3.13.18",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "shap": "0.54.1"
+  },
+  "dataset": {
+    "file": "diabetes_012_health_indicators_BRFSS2015.csv",
+    "sha256": "a971809d0786d2d7d7f6070f83dfe8af9d860ea33a79e0e2701c8a49f78f9861",
+    "rows_in_file": 253680,
+    "rows": 253096,
+    "dropped_for_implausible_bmi": 584,
+    "positives": 35270,
+    "positive_rate": 0.1394,
+    "prediabetes_share": 0.0183,
+    "identical_rows": 73685,
+    "zeros_treated_as_missing": {}
+  },
+  "intended_use": "Educational and research demonstration of how a simple model's estimate changes with its inputs. NOT a medical device. Not for diagnosis, screening, treatment decisions or any clinical use.",
+  "cv_folds": 5,
+  "fast_mode": false
+}

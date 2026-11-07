@@ -1,10 +1,11 @@
 import type { Condition, Prediction } from "../../api/types";
+import { CONDITION_HINT, CONDITION_NAME } from "../../lib/conditions";
 import { BAND_CHIP, BAND_LABEL, pct, timeAgo } from "../../lib/format";
 import { Button } from "../ui/Button";
 import { ContentTag, ExperimentalNote } from "../ui/ContentTag";
 import { Glass } from "../ui/Glass";
 
-const NAME: Record<Condition, string> = { diabetes: "Diabetes", heart_disease: "Heart disease" };
+const NAME = CONDITION_NAME;
 
 export function DiseaseCard({ condition, prediction, available, active, onSelect, onRun }: {
   condition: Condition; prediction: Prediction | null; available: boolean; active: boolean;
@@ -18,6 +19,7 @@ export function DiseaseCard({ condition, prediction, available, active, onSelect
           : <span className="rounded-full bg-dim px-2.5 py-0.5 text-xs font-semibold text-muted">{available ? "No estimate yet" : "Not available"}</span>}
       </div>
 
+      <p className="mt-1 text-xs text-muted">{CONDITION_HINT[condition]}</p>
       {!available ? (
         <p className="mt-3 text-sm text-muted">This model is not available right now.</p>
       ) : prediction ? (

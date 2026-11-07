@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.errors import ApiError
 from app.models.tables import ModelVersion
 
-CONDITIONS = ("diabetes", "heart_disease")
+CONDITIONS = ("diabetes", "heart_disease", "diabetes_survey")
 
 
 class ModelRegistry:

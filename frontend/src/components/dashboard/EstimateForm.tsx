@@ -31,6 +31,26 @@ export const HEART_FIELDS: readonly HeartField[] = [
   { name: "oldpeak", label: "ST depression during exercise", unit: "mm", min: 0, max: 7, step: 0.1, hint: "From a stress-test ECG report." },
 ];
 
+/** Mirrors ml/artifacts/diabetes_survey feature_schema.json; the server validates again. */
+export const SURVEY_FIELDS: readonly HeartField[] = [
+  { name: "age_band", label: "Age group", unit: "", min: 1, max: 13, step: 1, hint: "", options: [["1","18 to 24"],["2","25 to 29"],["3","30 to 34"],["4","35 to 39"],["5","40 to 44"],["6","45 to 49"],["7","50 to 54"],["8","55 to 59"],["9","60 to 64"],["10","65 to 69"],["11","70 to 74"],["12","75 to 79"],["13","80 or older"]] },
+  { name: "sex", label: "Sex", unit: "", min: 0, max: 1, step: 1, hint: "The model was trained with male or female only.", options: [["1", "Male"], ["0", "Female"]] },
+  { name: "bmi", label: "Body mass index", unit: "kg/m²", min: 12, max: 70, step: 0.1, hint: "" },
+  { name: "high_bp", label: "Ever told you have high blood pressure", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "high_chol", label: "Ever told you have high cholesterol", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "stroke", label: "Ever told you had a stroke", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "heart_disease_or_attack", label: "Ever told you had coronary heart disease or a heart attack", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "smoker", label: "Smoked at least 100 cigarettes in your life", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "physical_activity", label: "Any physical activity in the past 30 days (outside work)", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "fruit_daily", label: "Eat fruit at least once a day", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "veg_daily", label: "Eat vegetables at least once a day", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "heavy_alcohol", label: "Heavy drinker (men over 14, women over 7 drinks a week)", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+  { name: "general_health", label: "General health", unit: "", min: 1, max: 5, step: 1, hint: "", options: [["1","Excellent"],["2","Very good"],["3","Good"],["4","Fair"],["5","Poor"]] },
+  { name: "mental_health_days", label: "Days of poor mental health in the past 30", unit: "days", min: 0, max: 30, step: 1, hint: "" },
+  { name: "physical_health_days", label: "Days of poor physical health in the past 30", unit: "days", min: 0, max: 30, step: 1, hint: "" },
+  { name: "difficulty_walking", label: "Serious difficulty walking or climbing stairs", unit: "", min: 0, max: 1, step: 1, hint: "", options: [["0", "No"], ["1", "Yes"]] },
+];
+
 export function prefillHeart(data: DashboardData | null): { values: Record<string, string>; sources: Record<string, string> } {
   const values: Record<string, string> = {}, sources: Record<string, string> = {};
   if (!data) return { values, sources };
@@ -41,6 +61,21 @@ export function prefillHeart(data: DashboardData | null): { values: Record<strin
   if (data.profile.age !== null) take("age", data.profile.age, "from your profile");
   if (data.profile.sex === "male") take("sex", 1, "from your profile");
   if (data.profile.sex === "female") take("sex", 0, "from your profile");
+  return { values, sources };
+}
+
+export function prefillSurvey(data: DashboardData | null): { values: Record<string, string>; sources: Record<string, string> } {
+  const values: Record<string, string> = {}, sources: Record<string, string> = {};
+  if (!data) return { values, sources };
+  const m = data.latest_measurements;
+  if (m.bmi) { values.bmi = String(m.bmi.value); sources.bmi = `from your ${shortDate(m.bmi.recorded_at)} measurement`; }
+  else if (data.profile.bmi) { values.bmi = String(data.profile.bmi.value); sources.bmi = data.profile.bmi.source; }
+  if (data.profile.age !== null) {
+    const a = data.profile.age;
+    values.age_band = String(a < 25 ? 1 : a >= 80 ? 13 : Math.floor((a - 25) / 5) + 2); sources.age_band = "from your profile";
+  }
+  if (data.profile.sex === "male") { values.sex = "1"; sources.sex = "from your profile"; }
+  if (data.profile.sex === "female") { values.sex = "0"; sources.sex = "from your profile"; }
   return { values, sources };
 }
 
@@ -59,8 +94,9 @@ export function prefill(data: DashboardData | null): { values: Record<string, st
 
 export function EstimateForm({ data, onDone, onCancel, condition = "diabetes" }: { data: DashboardData | null; onDone(p: Prediction): void; onCancel(): void; condition?: Condition }) {
   const heart = condition === "heart_disease";
-  const fields: readonly HeartField[] = heart ? HEART_FIELDS : DIABETES_FIELDS;
-  const initial = useMemo(() => (heart ? prefillHeart(data) : prefill(data)), [data, heart]);
+  const survey = condition === "diabetes_survey";
+  const fields: readonly HeartField[] = heart ? HEART_FIELDS : survey ? SURVEY_FIELDS : DIABETES_FIELDS;
+  const initial = useMemo(() => (heart ? prefillHeart(data) : survey ? prefillSurvey(data) : prefill(data)), [data, heart, survey]);
   const [values, setValues] = useState<Record<string, string>>(initial.values);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
@@ -80,23 +116,27 @@ export function EstimateForm({ data, onDone, onCancel, condition = "diabetes" }:
     setErrors(next); setFormError("");
     if (Object.keys(next).length) return;
     setBusy(true);
-    try { onDone(await api.post<Prediction>(heart ? "/predictions/heart-disease" : "/predictions/diabetes", { features })); }
+    try { onDone(await api.post<Prediction>(heart ? "/predictions/heart-disease" : survey ? "/predictions/diabetes-survey" : "/predictions/diabetes", { features })); }
     catch (err) {
       if (err instanceof ApiError) { setErrors(err.fields); setFormError(err.message); } else setFormError("Something went wrong.");
     } finally { setBusy(false); }
   }
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-4" aria-label={heart ? "Heart disease estimate inputs" : "Diabetes estimate inputs"}>
-      {heart ? (
+    <form onSubmit={submit} noValidate className="space-y-4" aria-label={heart ? "Heart disease estimate inputs" : survey ? "Diabetes lifestyle survey estimate inputs" : "Diabetes estimate inputs"}>
+      {survey ? (
         <p className="rounded-xl bg-brand-soft p-3 text-sm">
-          This model was trained on 303 people referred for a heart angiogram at one clinic in Cleveland. It estimates whether narrowing of heart arteries is found at testing, not your future risk. Several inputs (stress-test heart rate, ST depression, ECG) come from clinic tests; leave this form if you don't have them.
+          This model was trained on about 253,000 US adults who answered a 2015 health survey. It needs no lab test, and it estimates how likely someone with your answers is to report a diabetes diagnosis. It cannot find undiagnosed diabetes and is not validated outside the US.
+        </p>
+      ) : heart ? (
+        <p className="rounded-xl bg-brand-soft p-3 text-sm">
+          This model was trained on 920 people referred for a heart angiogram at four hospitals (USA, Hungary, Switzerland). It estimates whether narrowing of heart arteries is found at testing, not your future risk. Several inputs (stress-test heart rate, ST depression, ECG) come from clinic tests; leave this form if you don't have them.
         </p>
       ) : (
       <p className="rounded-xl bg-brand-soft p-3 text-sm">
         This model was trained on women aged 21 to 81 of Pima Indian heritage. If that isn't you, treat the result as a demonstration of how the model reacts to numbers, not as information about you.
       </p>)}
-      {!heart && data?.latest_measurements.glucose_mgdl && !data.latest_measurements.glucose_2h_mgdl && (
+      {!heart && !survey && data?.latest_measurements.glucose_mgdl && !data.latest_measurements.glucose_2h_mgdl && (
         <p className="rounded-xl bg-moderate-bg p-3 text-sm text-moderate" role="note">
           You have a fasting or random glucose reading, but this model needs a 2-hour glucose tolerance test value, so your reading was not used. Enter a 2-hour value if you have one.
         </p>)}

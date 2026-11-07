@@ -1,3 +1,4 @@
+import { CONDITIONS, CONDITION_NAME, isCondition } from "../lib/conditions";
 import { featureLabel, featureValue } from "../lib/format";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
@@ -11,7 +12,8 @@ import { CardTitle, Glass } from "../components/ui/Glass";
 import { EmptyState, ErrorState, Skeleton } from "../components/ui/States";
 import { Button } from "../components/ui/Button";
 
-const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: ["age", "trestbps", "chol", "thalach", "oldpeak"] };
+const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: ["age", "trestbps", "chol", "thalach", "oldpeak"],
+  diabetes_survey: ["bmi", "age_band", "physical_health_days", "mental_health_days"] };
 
 function Cohort({ condition, snapshot }: { condition: Condition; snapshot: Record<string, number> }) {
   const [rows, setRows] = useState<CohortPercentile[] | null>(null);
@@ -40,8 +42,10 @@ function Cohort({ condition, snapshot }: { condition: Condition; snapshot: Recor
         </ul>
       )}
       <p className="mt-3 text-xs text-muted">{condition === "heart_disease"
-          ? "Position within this study's training group only (303 people referred for a heart angiogram at one clinic in Cleveland). It says nothing about the general population."
-          : "Position within this study's training group only (women of Pima heritage, 21 to 81). It says nothing about the general population."}</p>
+          ? "Position within this study's training group only (920 people referred for a heart angiogram at four hospitals). It says nothing about the general population."
+          : condition === "diabetes_survey"
+            ? "Position within this study's training group only (US adults who answered a 2015 health survey). It says nothing about other populations."
+            : "Position within this study's training group only (women of Pima heritage, 21 to 81). It says nothing about the general population."}</p>
     </Glass>
   );
 }
@@ -49,19 +53,19 @@ function Cohort({ condition, snapshot }: { condition: Condition; snapshot: Recor
 export function RiskDetailPage() {
   const { condition } = useParams();
   const { data, loading, error, reload } = useDashboard();
-  if (condition !== "diabetes" && condition !== "heart_disease") return <Navigate to="/risk/diabetes" replace />;
+  if (!isCondition(condition)) return <Navigate to="/risk/diabetes" replace />;
   if (!data) return error ? <ErrorState message={error.message} onRetry={() => void reload()} /> : <Skeleton className="h-96" />;
   const p = data.latest_predictions[condition];
   const available = data.models_available.includes(condition);
   const tabs = (
-    <nav aria-label="Condition" className="mb-4 flex gap-2">
-      {(["diabetes", "heart_disease"] as Condition[]).map((c) => (
+    <nav aria-label="Condition" className="mb-4 flex flex-wrap gap-2">
+      {CONDITIONS.map((c) => (
         <Link key={c} to={`/risk/${c}`} aria-current={c === condition ? "page" : undefined}
-          className={`rounded-full px-4 py-1.5 text-sm font-semibold ${c === condition ? "bg-brand text-on-strong" : "bg-card/70 hover:bg-card"}`}>{c === "diabetes" ? "Diabetes" : "Heart disease"}</Link>
+          className={`rounded-full px-4 py-1.5 text-sm font-semibold ${c === condition ? "bg-brand text-on-strong" : "bg-card/70 hover:bg-card"}`}>{CONDITION_NAME[c]}</Link>
       ))}
     </nav>
   );
-  if (!available) return <>{tabs}<EmptyState title="Heart disease model not available">The model could not be loaded on the server. Nothing is shown here rather than an invented number.</EmptyState></>;
+  if (!available) return <>{tabs}<EmptyState title={`${CONDITION_NAME[condition]} model not available`}>The model could not be loaded on the server. Nothing is shown here rather than an invented number.</EmptyState></>;
   if (!p) return <>{tabs}<EmptyState title="No estimate yet" action={<Link to="/"><Button>Go to dashboard</Button></Link>}>Run your first estimate from the dashboard.</EmptyState></>;
 
   const drivers = p.explanation?.top_drivers ?? [];

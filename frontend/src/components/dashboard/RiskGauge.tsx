@@ -5,7 +5,7 @@ import { BAND_CHIP, BAND_LABEL, pct, timeAgo } from "../../lib/format";
 import { CardTitle, Glass } from "../ui/Glass";
 import { ContentTag, ExperimentalNote } from "../ui/ContentTag";
 
-const TITLE = { diabetes: "Diabetes estimate", heart_disease: "Heart disease estimate" } as const;
+const TITLE = { diabetes: "Diabetes estimate", diabetes_survey: "Diabetes estimate (lifestyle survey)", heart_disease: "Heart disease estimate" } as const;
 
 function CountUp({ value, reduce }: { value: number; reduce: boolean }) {
   const mv = useMotionValue(reduce ? value : 0);

@@ -15,7 +15,14 @@ from app.models.tables import HealthMeasurement, HealthProfile, User
 MEASURED = {
     "diabetes": {"glucose": "glucose_2h_mgdl", "blood_pressure": "bp_diastolic", "bmi": "bmi"},
     "heart_disease": {"trestbps": "bp_systolic", "chol": "cholesterol_mgdl", "thalach": "heart_rate_max"},
+    "diabetes_survey": {"bmi": "bmi"},
 }
+
+# BRFSS age groups: 1 = 18-24, 2 = 25-29, ... 12 = 75-79, 13 = 80 or older
+def age_band(years: int) -> int:
+    if years < 18:
+        raise ValueError("The survey model covers adults (18 and over).")
+    return 1 if years <= 24 else min(13, 2 + (years - 25) // 5)
 
 
 def age_years(dob: date, today: date | None = None) -> int:
@@ -51,6 +58,10 @@ def assemble_inputs(db: Session, user: User, condition: str, explicit: dict, use
         profile = db.get(HealthProfile, user.id)
         if "age" in feature_names and profile and profile.date_of_birth:
             inputs["age"], sources["age"] = age_years(profile.date_of_birth), "profile date of birth"
+        if "age_band" in feature_names and profile and profile.date_of_birth:
+            years = age_years(profile.date_of_birth)
+            if years >= 18:
+                inputs["age_band"], sources["age_band"] = age_band(years), f"profile date of birth (age {years})"
         if "sex" in feature_names and profile and profile.sex in ("male", "female"):
             inputs["sex"], sources["sex"] = 1 if profile.sex == "male" else 0, "profile"
         for feature, mtype in MEASURED.get(condition, {}).items():

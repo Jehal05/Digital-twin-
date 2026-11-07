@@ -21,7 +21,7 @@ router = APIRouter(tags=["insights"])
 
 
 @router.get("/cohort/percentile")
-def percentile(request: Request, condition: str = Query(pattern="^(diabetes|heart_disease)$"), feature: str = Query(max_length=32),
+def percentile(request: Request, condition: str = Query(pattern="^(diabetes|heart_disease|diabetes_survey)$"), feature: str = Query(max_length=32),
                value: float = Query(), user: User = Depends(current_user)):
     reg = request.app.state.registry
     model = reg.get(condition)
@@ -78,7 +78,7 @@ def dashboard(request: Request, user: User = Depends(current_user), db: Session 
 
 
 @router.get("/models/evaluation")
-def evaluation(request: Request, condition: str | None = Query(None, pattern="^(diabetes|heart_disease)$"),
+def evaluation(request: Request, condition: str | None = Query(None, pattern="^(diabetes|heart_disease|diabetes_survey)$"),
                user: User = Depends(current_user)):
     reg = request.app.state.registry
     conditions = [condition] if condition else sorted(reg.models)

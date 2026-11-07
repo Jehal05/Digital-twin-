@@ -1,0 +1,1007 @@
+{
+  "condition": "diabetes_survey",
+  "version": "1.0.0",
+  "primary_algorithm": "logistic_regression",
+  "evaluation_basis": "nested_cross_validation",
+  "selection_rule": "Nested cross-validation across 4 algorithms; the simplest model within 0.01 ROC-AUC of the best is kept. hist_gradient_boosting scored highest (AUC 0.828) but only 0.006 above logistic_regression, within the 0.01 simplicity margin, so the simpler model is kept.",
+  "split": {
+    "scheme": "nested cross-validation: every row held out once",
+    "train_rows": 253096,
+    "test_rows": 253096,
+    "train_positive_rate": 0.1394,
+    "test_positive_rate": 0.1394
+  },
+  "models": {
+    "logistic_regression": {
+      "is_primary": true,
+      "best_params": {
+        "C": 0.1
+      },
+      "cv_roc_auc_train": 0.8214,
+      "cv_roc_auc_std": 0.0023,
+      "test": {
+        "roc_auc": 0.8214,
+        "brier_score": 0.0987,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0047,
+            0.0101,
+            0.0163,
+            0.0228,
+            0.0296,
+            0.0369,
+            0.0442,
+            0.0518,
+            0.0594,
+            0.067,
+            0.0751,
+            0.0839,
+            0.0926,
+            0.1017,
+            0.1108,
+            0.1206,
+            0.1305,
+            0.1409,
+            0.1511,
+            0.1623,
+            0.1736,
+            0.1857,
+            0.1975,
+            0.2105,
+            0.2241,
+            0.2383,
+            0.2533,
+            0.2672,
+            0.2823,
+            0.2987,
+            0.3149,
+            0.3317,
+            0.3499,
+            0.3686,
+            0.3876,
+            0.4077,
+            0.4265,
+            0.4465,
+            0.4678,
+            0.4906,
+            0.5133,
+            0.5371,
+            0.561,
+            0.5856,
+            0.6094,
+            0.6346,
+            0.6603,
+            0.6868,
+            0.7126,
+            0.7392,
+            0.7661,
+            0.7934,
+            0.8205,
+            0.8491,
+            0.878,
+            0.9074,
+            0.9365,
+            0.9668,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0506,
+            0.0925,
+            0.1313,
+            0.1666,
+            0.2022,
+            0.2343,
+            0.2642,
+            0.2937,
+            0.3236,
+            0.3516,
+            0.3794,
+            0.4053,
+            0.4313,
+            0.4572,
+            0.481,
+            0.5058,
+            0.5293,
+            0.5529,
+            0.5754,
+            0.5978,
+            0.6191,
+            0.641,
+            0.6615,
+            0.6814,
+            0.7,
+            0.7189,
+            0.7374,
+            0.756,
+            0.7733,
+            0.7903,
+            0.8063,
+            0.8226,
+            0.8377,
+            0.8523,
+            0.8657,
+            0.8794,
+            0.8922,
+            0.9044,
+            0.9157,
+            0.9254,
+            0.9347,
+            0.9436,
+            0.9509,
+            0.9579,
+            0.9644,
+            0.9694,
+            0.9742,
+            0.9781,
+            0.9824,
+            0.986,
+            0.9893,
+            0.992,
+            0.9941,
+            0.9957,
+            0.9971,
+            0.9979,
+            0.9988,
+            0.9994,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.015,
+            0.0386,
+            0.0815,
+            0.1673,
+            0.3941
+          ],
+          "fraction_positive": [
+            0.0072,
+            0.0304,
+            0.086,
+            0.1854,
+            0.3877
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.009,
+          "max_abs": 0.0181
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.8645,
+          "sensitivity": 0.1585,
+          "specificity": 0.9788,
+          "precision": 0.5471,
+          "confusion_matrix": {
+            "tn": 213199,
+            "fp": 4627,
+            "fn": 29680,
+            "tp": 5590
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.1266,
+          "accuracy": 0.711,
+          "sensitivity": 0.7949,
+          "specificity": 0.6974,
+          "precision": 0.2984,
+          "confusion_matrix": {
+            "tn": 151903,
+            "fp": 65923,
+            "fn": 7234,
+            "tp": 28036
+          }
+        }
+      }
+    },
+    "random_forest": {
+      "is_primary": false,
+      "best_params": {
+        "max_depth": 14,
+        "min_samples_leaf": 30
+      },
+      "cv_roc_auc_train": 0.8259,
+      "cv_roc_auc_std": 0.0025,
+      "test": {
+        "roc_auc": 0.8258,
+        "brier_score": 0.0988,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0045,
+            0.0098,
+            0.0155,
+            0.0213,
+            0.0275,
+            0.0341,
+            0.0413,
+            0.0485,
+            0.0557,
+            0.0642,
+            0.0721,
+            0.0803,
+            0.0889,
+            0.098,
+            0.1075,
+            0.1173,
+            0.1273,
+            0.1376,
+            0.1483,
+            0.1593,
+            0.1715,
+            0.1839,
+            0.1959,
+            0.2098,
+            0.2237,
+            0.2377,
+            0.2535,
+            0.2694,
+            0.2859,
+            0.302,
+            0.3191,
+            0.337,
+            0.3555,
+            0.3733,
+            0.3926,
+            0.4139,
+            0.436,
+            0.4581,
+            0.4808,
+            0.5038,
+            0.5264,
+            0.5492,
+            0.5737,
+            0.5987,
+            0.6238,
+            0.6494,
+            0.6756,
+            0.702,
+            0.7289,
+            0.7545,
+            0.7809,
+            0.8088,
+            0.8357,
+            0.8645,
+            0.8901,
+            0.9175,
+            0.9453,
+            0.9719,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0544,
+            0.0976,
+            0.1352,
+            0.1698,
+            0.203,
+            0.2373,
+            0.2686,
+            0.2993,
+            0.329,
+            0.3578,
+            0.3852,
+            0.4117,
+            0.4374,
+            0.4639,
+            0.4893,
+            0.513,
+            0.5375,
+            0.5611,
+            0.5835,
+            0.6055,
+            0.6272,
+            0.6483,
+            0.6688,
+            0.6891,
+            0.7091,
+            0.7286,
+            0.7469,
+            0.765,
+            0.7819,
+            0.7988,
+            0.8149,
+            0.831,
+            0.8456,
+            0.8601,
+            0.8737,
+            0.8868,
+            0.8988,
+            0.9106,
+            0.9215,
+            0.9319,
+            0.9408,
+            0.9492,
+            0.9561,
+            0.9627,
+            0.9678,
+            0.9735,
+            0.9779,
+            0.9817,
+            0.9851,
+            0.9884,
+            0.991,
+            0.9931,
+            0.9946,
+            0.9959,
+            0.9974,
+            0.9984,
+            0.999,
+            0.9996,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0397,
+            0.0481,
+            0.0711,
+            0.1354,
+            0.4021
+          ],
+          "fraction_positive": [
+            0.0071,
+            0.0296,
+            0.0849,
+            0.1798,
+            0.3954
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.0232,
+          "max_abs": 0.0444
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.8654,
+          "sensitivity": 0.1995,
+          "specificity": 0.9732,
+          "precision": 0.5467,
+          "confusion_matrix": {
+            "tn": 211994,
+            "fp": 5832,
+            "fn": 28235,
+            "tp": 7035
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.0991,
+          "accuracy": 0.7102,
+          "sensitivity": 0.8018,
+          "specificity": 0.6954,
+          "precision": 0.2988,
+          "confusion_matrix": {
+            "tn": 151473,
+            "fp": 66353,
+            "fn": 6992,
+            "tp": 28278
+          }
+        }
+      }
+    },
+    "hist_gradient_boosting": {
+      "is_primary": false,
+      "best_params": {
+        "l2_regularization": 1.0,
+        "learning_rate": 0.05,
+        "max_depth": 3
+      },
+      "cv_roc_auc_train": 0.8275,
+      "cv_roc_auc_std": 0.0024,
+      "test": {
+        "roc_auc": 0.8274,
+        "brier_score": 0.097,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0048,
+            0.0101,
+            0.0161,
+            0.0223,
+            0.0291,
+            0.0366,
+            0.0438,
+            0.0514,
+            0.0594,
+            0.0678,
+            0.0768,
+            0.0857,
+            0.0954,
+            0.1051,
+            0.1145,
+            0.1245,
+            0.1355,
+            0.146,
+            0.1577,
+            0.1695,
+            0.1814,
+            0.1939,
+            0.207,
+            0.221,
+            0.2351,
+            0.25,
+            0.265,
+            0.28,
+            0.2956,
+            0.3121,
+            0.3286,
+            0.347,
+            0.3645,
+            0.3828,
+            0.4016,
+            0.4218,
+            0.4423,
+            0.4649,
+            0.4871,
+            0.5106,
+            0.5339,
+            0.5572,
+            0.5813,
+            0.6065,
+            0.6314,
+            0.6563,
+            0.6817,
+            0.707,
+            0.7332,
+            0.7592,
+            0.7863,
+            0.8115,
+            0.8391,
+            0.8661,
+            0.8917,
+            0.9183,
+            0.945,
+            0.9735,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0582,
+            0.103,
+            0.1435,
+            0.1802,
+            0.2141,
+            0.2485,
+            0.2818,
+            0.3142,
+            0.3448,
+            0.3741,
+            0.4026,
+            0.4298,
+            0.4581,
+            0.4836,
+            0.5098,
+            0.5338,
+            0.558,
+            0.5816,
+            0.6037,
+            0.6258,
+            0.6478,
+            0.6686,
+            0.6885,
+            0.7078,
+            0.7262,
+            0.7441,
+            0.762,
+            0.7788,
+            0.7955,
+            0.8114,
+            0.8272,
+            0.842,
+            0.8564,
+            0.8695,
+            0.8825,
+            0.8947,
+            0.9061,
+            0.9171,
+            0.9263,
+            0.9354,
+            0.9439,
+            0.9524,
+            0.9593,
+            0.9651,
+            0.9702,
+            0.9755,
+            0.9801,
+            0.9834,
+            0.987,
+            0.9895,
+            0.9917,
+            0.9938,
+            0.9953,
+            0.9966,
+            0.9975,
+            0.9985,
+            0.9992,
+            0.9998,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0084,
+            0.0308,
+            0.0815,
+            0.1789,
+            0.3973
+          ],
+          "fraction_positive": [
+            0.0068,
+            0.0296,
+            0.0828,
+            0.1814,
+            0.3961
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.0016,
+          "max_abs": 0.0025
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.8667,
+          "sensitivity": 0.1601,
+          "specificity": 0.9811,
+          "precision": 0.5783,
+          "confusion_matrix": {
+            "tn": 213709,
+            "fp": 4117,
+            "fn": 29625,
+            "tp": 5645
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.1361,
+          "accuracy": 0.7145,
+          "sensitivity": 0.7997,
+          "specificity": 0.7007,
+          "precision": 0.302,
+          "confusion_matrix": {
+            "tn": 152624,
+            "fp": 65202,
+            "fn": 7065,
+            "tp": 28205
+          }
+        }
+      }
+    },
+    "neural_network": {
+      "is_primary": false,
+      "best_params": {
+        "alpha": 0.1
+      },
+      "cv_roc_auc_train": 0.8268,
+      "cv_roc_auc_std": 0.002,
+      "test": {
+        "roc_auc": 0.8259,
+        "brier_score": 0.099,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0046,
+            0.0096,
+            0.0153,
+            0.0215,
+            0.0279,
+            0.0347,
+            0.0414,
+            0.0489,
+            0.0565,
+            0.0646,
+            0.0728,
+            0.0815,
+            0.09,
+            0.0989,
+            0.1082,
+            0.1176,
+            0.1277,
+            0.1379,
+            0.1491,
+            0.16,
+            0.1719,
+            0.1841,
+            0.1968,
+            0.2099,
+            0.2229,
+            0.2362,
+            0.2503,
+            0.2658,
+            0.2807,
+            0.2963,
+            0.3135,
+            0.3305,
+            0.3487,
+            0.3665,
+            0.3855,
+            0.4051,
+            0.4248,
+            0.4461,
+            0.4679,
+            0.4901,
+            0.5129,
+            0.537,
+            0.5615,
+            0.5857,
+            0.6108,
+            0.6373,
+            0.6636,
+            0.6891,
+            0.7171,
+            0.7452,
+            0.7731,
+            0.8014,
+            0.8286,
+            0.8562,
+            0.8837,
+            0.9126,
+            0.942,
+            0.9708,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0529,
+            0.0967,
+            0.1357,
+            0.172,
+            0.2039,
+            0.2368,
+            0.2718,
+            0.3012,
+            0.3303,
+            0.3601,
+            0.3871,
+            0.4135,
+            0.44,
+            0.4654,
+            0.4893,
+            0.5138,
+            0.5375,
+            0.5612,
+            0.5835,
+            0.6058,
+            0.6274,
+            0.6481,
+            0.6686,
+            0.6887,
+            0.7075,
+            0.7262,
+            0.7453,
+            0.7628,
+            0.7798,
+            0.7966,
+            0.813,
+            0.8288,
+            0.8436,
+            0.8581,
+            0.8714,
+            0.8845,
+            0.8969,
+            0.9087,
+            0.9192,
+            0.929,
+            0.9378,
+            0.9461,
+            0.9533,
+            0.9592,
+            0.9653,
+            0.9694,
+            0.9743,
+            0.9784,
+            0.9819,
+            0.9843,
+            0.987,
+            0.9893,
+            0.9918,
+            0.9934,
+            0.9957,
+            0.9972,
+            0.9984,
+            0.9993,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0427,
+            0.0506,
+            0.0701,
+            0.1316,
+            0.4014
+          ],
+          "fraction_positive": [
+            0.0092,
+            0.027,
+            0.0829,
+            0.1828,
+            0.3948
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.0255,
+          "max_abs": 0.0512
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.865,
+          "sensitivity": 0.2052,
+          "specificity": 0.9719,
+          "precision": 0.5415,
+          "confusion_matrix": {
+            "tn": 211697,
+            "fp": 6129,
+            "fn": 28031,
+            "tp": 7239
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.0982,
+          "accuracy": 0.7145,
+          "sensitivity": 0.8,
+          "specificity": 0.7007,
+          "precision": 0.302,
+          "confusion_matrix": {
+            "tn": 152627,
+            "fp": 65199,
+            "fn": 7055,
+            "tp": 28215
+          }
+        }
+      }
+    }
+  },
+  "operating_threshold": 0.1266,
+  "operating_thresholds": {
+    "logistic_regression": 0.1266,
+    "random_forest": 0.0991,
+    "hist_gradient_boosting": 0.1361,
+    "neural_network": 0.0982
+  },
+  "permutation_importance": [
+    {
+      "feature": "general_health",
+      "mean_auc_drop": 0.0587,
+      "std": 0.0042
+    },
+    {
+      "feature": "bmi",
+      "mean_auc_drop": 0.0354,
+      "std": 0.0018
+    },
+    {
+      "feature": "age_band",
+      "mean_auc_drop": 0.031,
+      "std": 0.0029
+    },
+    {
+      "feature": "high_bp",
+      "mean_auc_drop": 0.0204,
+      "std": 0.0021
+    },
+    {
+      "feature": "high_chol",
+      "mean_auc_drop": 0.0121,
+      "std": 0.0017
+    },
+    {
+      "feature": "heavy_alcohol",
+      "mean_auc_drop": 0.0055,
+      "std": 0.0011
+    },
+    {
+      "feature": "sex",
+      "mean_auc_drop": 0.0021,
+      "std": 0.0007
+    },
+    {
+      "feature": "difficulty_walking",
+      "mean_auc_drop": 0.0012,
+      "std": 0.0004
+    },
+    {
+      "feature": "heart_disease_or_attack",
+      "mean_auc_drop": 0.001,
+      "std": 0.0003
+    },
+    {
+      "feature": "stroke",
+      "mean_auc_drop": 0.0005,
+      "std": 0.0003
+    },
+    {
+      "feature": "physical_activity",
+      "mean_auc_drop": 0.0002,
+      "std": 0.0002
+    },
+    {
+      "feature": "veg_daily",
+      "mean_auc_drop": 0.0001,
+      "std": 0.0002
+    },
+    {
+      "feature": "physical_health_days",
+      "mean_auc_drop": 0.0001,
+      "std": 0.0004
+    },
+    {
+      "feature": "smoker",
+      "mean_auc_drop": -0.0,
+      "std": 0.0001
+    },
+    {
+      "feature": "fruit_daily",
+      "mean_auc_drop": -0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "mental_health_days",
+      "mean_auc_drop": -0.0,
+      "std": 0.0001
+    }
+  ],
+  "feature_set_sensitivity": {},
+  "nested_cv": {
+    "logistic_regression": {
+      "roc_auc": {
+        "mean": 0.8214,
+        "std": 0.0023
+      },
+      "brier": {
+        "mean": 0.0988,
+        "std": 0.0005
+      },
+      "log_loss": {
+        "mean": 0.3194,
+        "std": 0.0015
+      },
+      "ece": {
+        "mean": 0.0132,
+        "std": 0.0007
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.0,
+        "std": 0.0,
+        "folds_better": 0,
+        "folds": 5
+      }
+    },
+    "random_forest": {
+      "roc_auc": {
+        "mean": 0.8259,
+        "std": 0.0025
+      },
+      "brier": {
+        "mean": 0.0988,
+        "std": 0.0007
+      },
+      "log_loss": {
+        "mean": 0.3239,
+        "std": 0.0023
+      },
+      "ece": {
+        "mean": 0.0313,
+        "std": 0.0019
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.0045,
+        "std": 0.0011,
+        "folds_better": 5,
+        "folds": 5
+      }
+    },
+    "hist_gradient_boosting": {
+      "roc_auc": {
+        "mean": 0.8275,
+        "std": 0.0024
+      },
+      "brier": {
+        "mean": 0.097,
+        "std": 0.0006
+      },
+      "log_loss": {
+        "mean": 0.3138,
+        "std": 0.0017
+      },
+      "ece": {
+        "mean": 0.0035,
+        "std": 0.0009
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.006,
+        "std": 0.0008,
+        "folds_better": 5,
+        "folds": 5
+      }
+    },
+    "neural_network": {
+      "roc_auc": {
+        "mean": 0.8268,
+        "std": 0.002
+      },
+      "brier": {
+        "mean": 0.099,
+        "std": 0.0008
+      },
+      "log_loss": {
+        "mean": 0.325,
+        "std": 0.0026
+      },
+      "ece": {
+        "mean": 0.0343,
+        "std": 0.0027
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.0054,
+        "std": 0.0008,
+        "folds_better": 5,
+        "folds": 5
+      }
+    }
+  },
+  "nested_cv_design": {
+    "outer": "5 folds",
+    "inner": "3-fold grid search on a 25,000-row sample of each training part"
+  },
+  "subgroup_roc_auc": {
+    "women": {
+      "n": 141676,
+      "positive_rate": 0.1296,
+      "roc_auc": 0.8326
+    },
+    "men": {
+      "n": 111420,
+      "positive_rate": 0.1517,
+      "roc_auc": 0.8066
+    },
+    "age 18-44": {
+      "n": 54198,
+      "positive_rate": 0.0405,
+      "roc_auc": 0.8439
+    },
+    "age 45-64": {
+      "n": 142078,
+      "positive_rate": 0.1501,
+      "roc_auc": 0.8186
+    },
+    "age 65+": {
+      "n": 56820,
+      "positive_rate": 0.2067,
+      "roc_auc": 0.7316
+    },
+    "BMI under 25": {
+      "n": 72080,
+      "positive_rate": 0.0568,
+      "roc_auc": 0.8234
+    },
+    "BMI 25-29.9": {
+      "n": 93749,
+      "positive_rate": 0.114,
+      "roc_auc": 0.7968
+    },
+    "BMI 30+": {
+      "n": 87267,
+      "positive_rate": 0.2347,
+      "roc_auc": 0.7737
+    }
+  },
+  "external_validation": null,
+  "trust_meter_on_test": {
+    "mean_bootstrap_range_width": 0.0079,
+    "mean_lr_rf_disagreement_pp": 3.64,
+    "share_disagreeing_over_10pp": 0.0819
+  },
+  "data": {
+    "file": "diabetes_012_health_indicators_BRFSS2015.csv",
+    "sha256": "a971809d0786d2d7d7f6070f83dfe8af9d860ea33a79e0e2701c8a49f78f9861",
+    "rows_in_file": 253680,
+    "rows": 253096,
+    "dropped_for_implausible_bmi": 584,
+    "positives": 35270,
+    "positive_rate": 0.1394,
+    "prediabetes_share": 0.0183,
+    "identical_rows": 73685,
+    "zeros_treated_as_missing": {}
+  }
+}

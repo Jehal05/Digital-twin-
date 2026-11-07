@@ -5,18 +5,21 @@ import { BAND_LABEL, pct, points } from "../../lib/format";
 import { ContentTag, ExperimentalNote } from "../ui/ContentTag";
 import { CardTitle, Glass } from "../ui/Glass";
 
+/** The twin draws organs, so it shows the two organ-based models; the lifestyle survey model appears on the dashboard cards. */
+type TwinCondition = "diabetes" | "heart_disease";
+
 const GLOW: Record<RiskBand, string> = { low: "#22b573", moderate: "#f2a60c", high: "#e5534b" };
-const NAME: Record<Condition, string> = { diabetes: "Diabetes", heart_disease: "Heart disease" };
-const SYSTEM: Record<Condition, string> = { diabetes: "Metabolic system", heart_disease: "Cardiovascular system" };
-const POS: Record<Condition, { x: number; y: number; badgeX: number; anchor: "start" | "end" }> = {
+const NAME: Record<TwinCondition, string> = { diabetes: "Diabetes", heart_disease: "Heart disease" };
+const SYSTEM: Record<TwinCondition, string> = { diabetes: "Metabolic system", heart_disease: "Cardiovascular system" };
+const POS: Record<TwinCondition, { x: number; y: number; badgeX: number; anchor: "start" | "end" }> = {
   heart_disease: { x: 148, y: 160, badgeX: 214, anchor: "start" },
   diabetes: { x: 118, y: 224, badgeX: 10, anchor: "end" },
 };
 const MIN = 1, MAX = 2.4, STEP = 0.4;
 
 function Organ({ c, p, available, reduce, onHover, onSelect }: {
-  c: Condition; p: Prediction | null; available: boolean; reduce: boolean;
-  onHover(c: Condition | null): void; onSelect(c: Condition): void;
+  c: TwinCondition; p: Prediction | null; available: boolean; reduce: boolean;
+  onHover(c: TwinCondition | null): void; onSelect(c: TwinCondition): void;
 }) {
   const { x, y, badgeX, anchor } = POS[c];
   const has = available && p !== null;
@@ -48,12 +51,12 @@ function Organ({ c, p, available, reduce, onHover, onSelect }: {
 }
 
 export function DigitalTwin({ predictions, available, onSelect, onRun }: {
-  predictions: Record<Condition, Prediction | null>; available: Condition[]; onSelect(c: Condition): void; onRun(): void;
+  predictions: Record<Condition, Prediction | null>; available: Condition[]; onSelect(c: TwinCondition): void; onRun(): void;
 }) {
   const reduce = useReducedMotion() ?? false;
   const [scale, setScale] = useState(MIN);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [hover, setHover] = useState<Condition | null>(null);
+  const [hover, setHover] = useState<TwinCondition | null>(null);
   const [full, setFull] = useState(false);
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -69,7 +72,7 @@ export function DigitalTwin({ predictions, available, onSelect, onRun }: {
     } catch { /* fullscreen not permitted here */ }
   }
 
-  const summary = (["diabetes", "heart_disease"] as Condition[]).map((c) => {
+  const summary = (["diabetes", "heart_disease"] as TwinCondition[]).map((c) => {
     const p = predictions[c];
     return !available.includes(c) ? `${NAME[c]}: model not available` : p ? `${NAME[c]}: ${pct(p.score)}, ${BAND_LABEL[p.risk_band]}` : `${NAME[c]}: no estimate yet`;
   }).join(". ");
@@ -87,7 +90,7 @@ export function DigitalTwin({ predictions, available, onSelect, onRun }: {
           <svg viewBox="0 0 300 560" className="h-full max-h-[540px]" role="group" aria-label={`Schematic body with model estimates. ${summary}`}>
             <defs>
               <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="var(--color-card)" stopOpacity=".95" /><stop offset="1" stopColor="var(--color-brand-soft)" stopOpacity=".75" /></linearGradient>
-              {(["diabetes", "heart_disease"] as Condition[]).map((c) => {
+              {(["diabetes", "heart_disease"] as TwinCondition[]).map((c) => {
                 const col = predictions[c] && available.includes(c) ? GLOW[predictions[c]!.risk_band] : "#8a97b3";
                 return <radialGradient key={c} id={`glow-${c}`}><stop offset="0" stopColor={col} stopOpacity="1" /><stop offset="1" stopColor={col} stopOpacity="0" /></radialGradient>;
               })}
@@ -101,7 +104,7 @@ export function DigitalTwin({ predictions, available, onSelect, onRun }: {
               <rect x="100" y="304" width="48" height="236" rx="24" />
               <rect x="152" y="304" width="48" height="236" rx="24" />
             </g>
-            {(["heart_disease", "diabetes"] as Condition[]).map((c) => (
+            {(["heart_disease", "diabetes"] as TwinCondition[]).map((c) => (
               <Organ key={c} c={c} p={predictions[c]} available={available.includes(c)} reduce={reduce} onHover={setHover} onSelect={onSelect} />
             ))}
           </svg>
@@ -124,7 +127,7 @@ export function DigitalTwin({ predictions, available, onSelect, onRun }: {
       </div>
 
       <ul className="mt-3 grid grid-cols-2 gap-2 text-xs" aria-label="Legend">
-        {(["diabetes", "heart_disease"] as Condition[]).map((c) => (
+        {(["diabetes", "heart_disease"] as TwinCondition[]).map((c) => (
           <li key={c} className="panel-dim flex items-center gap-2 p-2">
             <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: predictions[c] && available.includes(c) ? GLOW[predictions[c]!.risk_band] : "#8a97b3" }} />
             <span><span className="font-semibold">{SYSTEM[c]}</span><br /><span className="text-muted">{NAME[c]} model{!available.includes(c) ? " (not trained yet)" : ""}</span></span>

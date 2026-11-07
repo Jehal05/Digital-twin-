@@ -1,0 +1,804 @@
+{
+ "dataset": "brfss_2015",
+ "data": {
+  "file": "diabetes_012_health_indicators_BRFSS2015.csv",
+  "sha256": "a971809d0786d2d7d7f6070f83dfe8af9d860ea33a79e0e2701c8a49f78f9861",
+  "rows_in_file": 253680,
+  "rows": 253096,
+  "dropped_for_implausible_bmi": 584,
+  "positives": 35270,
+  "positive_rate": 0.1394,
+  "prediabetes_share": 0.0183,
+  "identical_rows": 73685
+ },
+ "features": [
+  "HighBP",
+  "HighChol",
+  "BMI",
+  "Smoker",
+  "Stroke",
+  "HeartDiseaseorAttack",
+  "PhysActivity",
+  "Fruits",
+  "Veggies",
+  "HvyAlcoholConsump",
+  "GenHlth",
+  "MentHlth",
+  "PhysHlth",
+  "DiffWalk",
+  "Sex",
+  "Age"
+ ],
+ "algorithms": [
+  "logistic_regression",
+  "random_forest",
+  "hist_gradient_boosting",
+  "neural_network"
+ ],
+ "nested_cv": {
+  "outer": "5 folds",
+  "inner": "3-fold grid search on a 25,000-row sample of each training part",
+  "summary": {
+   "logistic_regression": {
+    "roc_auc": {
+     "mean": 0.8214,
+     "std": 0.0023
+    },
+    "brier": {
+     "mean": 0.0988,
+     "std": 0.0005
+    },
+    "log_loss": {
+     "mean": 0.3194,
+     "std": 0.0015
+    },
+    "ece": {
+     "mean": 0.0132,
+     "std": 0.0007
+    },
+    "auc_gain_vs_logistic": {
+     "mean": 0.0,
+     "std": 0.0,
+     "folds_better": 0,
+     "folds": 5
+    }
+   },
+   "random_forest": {
+    "roc_auc": {
+     "mean": 0.8259,
+     "std": 0.0025
+    },
+    "brier": {
+     "mean": 0.0988,
+     "std": 0.0007
+    },
+    "log_loss": {
+     "mean": 0.3239,
+     "std": 0.0023
+    },
+    "ece": {
+     "mean": 0.0313,
+     "std": 0.0019
+    },
+    "auc_gain_vs_logistic": {
+     "mean": 0.0045,
+     "std": 0.0011,
+     "folds_better": 5,
+     "folds": 5
+    }
+   },
+   "hist_gradient_boosting": {
+    "roc_auc": {
+     "mean": 0.8275,
+     "std": 0.0024
+    },
+    "brier": {
+     "mean": 0.097,
+     "std": 0.0006
+    },
+    "log_loss": {
+     "mean": 0.3138,
+     "std": 0.0017
+    },
+    "ece": {
+     "mean": 0.0035,
+     "std": 0.0009
+    },
+    "auc_gain_vs_logistic": {
+     "mean": 0.006,
+     "std": 0.0008,
+     "folds_better": 5,
+     "folds": 5
+    }
+   },
+   "neural_network": {
+    "roc_auc": {
+     "mean": 0.8268,
+     "std": 0.002
+    },
+    "brier": {
+     "mean": 0.099,
+     "std": 0.0008
+    },
+    "log_loss": {
+     "mean": 0.325,
+     "std": 0.0026
+    },
+    "ece": {
+     "mean": 0.0343,
+     "std": 0.0027
+    },
+    "auc_gain_vs_logistic": {
+     "mean": 0.0054,
+     "std": 0.0008,
+     "folds_better": 5,
+     "folds": 5
+    }
+   }
+  },
+  "per_fold": [
+   {
+    "name": "fold 1",
+    "n_train": 202476,
+    "n_test": 50620,
+    "positive_rate_test": 0.1394,
+    "scores": {
+     "logistic_regression": {
+      "roc_auc": 0.8248,
+      "brier": 0.0981,
+      "log_loss": 0.3171,
+      "ece": 0.0131,
+      "seconds": 0.8
+     },
+     "random_forest": {
+      "roc_auc": 0.8303,
+      "brier": 0.0976,
+      "log_loss": 0.3201,
+      "ece": 0.0295,
+      "seconds": 21.2
+     },
+     "hist_gradient_boosting": {
+      "roc_auc": 0.8315,
+      "brier": 0.0961,
+      "log_loss": 0.311,
+      "ece": 0.003,
+      "seconds": 73.3
+     },
+     "neural_network": {
+      "roc_auc": 0.8297,
+      "brier": 0.098,
+      "log_loss": 0.3217,
+      "ece": 0.0317,
+      "seconds": 9.9
+     }
+    },
+    "params": {
+     "logistic_regression": {
+      "C": 0.1
+     },
+     "random_forest": {
+      "max_depth": 14,
+      "min_samples_leaf": 30
+     },
+     "hist_gradient_boosting": {
+      "l2_regularization": 1.0,
+      "learning_rate": 0.05,
+      "max_depth": 3
+     },
+     "neural_network": {
+      "alpha": 0.1
+     }
+    }
+   },
+   {
+    "name": "fold 2",
+    "n_train": 202477,
+    "n_test": 50619,
+    "positive_rate_test": 0.1394,
+    "scores": {
+     "logistic_regression": {
+      "roc_auc": 0.8199,
+      "brier": 0.0992,
+      "log_loss": 0.3207,
+      "ece": 0.0141,
+      "seconds": 0.8
+     },
+     "random_forest": {
+      "roc_auc": 0.8243,
+      "brier": 0.0995,
+      "log_loss": 0.3258,
+      "ece": 0.0332,
+      "seconds": 19.9
+     },
+     "hist_gradient_boosting": {
+      "roc_auc": 0.8256,
+      "brier": 0.0977,
+      "log_loss": 0.3154,
+      "ece": 0.005,
+      "seconds": 14.2
+     },
+     "neural_network": {
+      "roc_auc": 0.8254,
+      "brier": 0.0994,
+      "log_loss": 0.3255,
+      "ece": 0.0345,
+      "seconds": 20.5
+     }
+    },
+    "params": {
+     "logistic_regression": {
+      "C": 0.1
+     },
+     "random_forest": {
+      "max_depth": 14,
+      "min_samples_leaf": 30
+     },
+     "hist_gradient_boosting": {
+      "l2_regularization": 1.0,
+      "learning_rate": 0.1,
+      "max_depth": 3
+     },
+     "neural_network": {
+      "alpha": 0.1
+     }
+    }
+   },
+   {
+    "name": "fold 3",
+    "n_train": 202477,
+    "n_test": 50619,
+    "positive_rate_test": 0.1394,
+    "scores": {
+     "logistic_regression": {
+      "roc_auc": 0.8193,
+      "brier": 0.0992,
+      "log_loss": 0.3206,
+      "ece": 0.0134,
+      "seconds": 0.8
+     },
+     "random_forest": {
+      "roc_auc": 0.8244,
+      "brier": 0.0992,
+      "log_loss": 0.3252,
+      "ece": 0.0321,
+      "seconds": 15.9
+     },
+     "hist_gradient_boosting": {
+      "roc_auc": 0.8259,
+      "brier": 0.0974,
+      "log_loss": 0.3148,
+      "ece": 0.0038,
+      "seconds": 21.5
+     },
+     "neural_network": {
+      "roc_auc": 0.8244,
+      "brier": 0.1001,
+      "log_loss": 0.3286,
+      "ece": 0.0369,
+      "seconds": 9.9
+     }
+    },
+    "params": {
+     "logistic_regression": {
+      "C": 0.1
+     },
+     "random_forest": {
+      "max_depth": 14,
+      "min_samples_leaf": 30
+     },
+     "hist_gradient_boosting": {
+      "l2_regularization": 1.0,
+      "learning_rate": 0.05,
+      "max_depth": 3
+     },
+     "neural_network": {
+      "alpha": 0.001
+     }
+    }
+   },
+   {
+    "name": "fold 4",
+    "n_train": 202477,
+    "n_test": 50619,
+    "positive_rate_test": 0.1394,
+    "scores": {
+     "logistic_regression": {
+      "roc_auc": 0.8206,
+      "brier": 0.0987,
+      "log_loss": 0.3196,
+      "ece": 0.0129,
+      "seconds": 0.8
+     },
+     "random_forest": {
+      "roc_auc": 0.8253,
+      "brier": 0.0989,
+      "log_loss": 0.3247,
+      "ece": 0.0327,
+      "seconds": 21.5
+     },
+     "hist_gradient_boosting": {
+      "roc_auc": 0.827,
+      "brier": 0.0971,
+      "log_loss": 0.3139,
+      "ece": 0.0033,
+      "seconds": 17.5
+     },
+     "neural_network": {
+      "roc_auc": 0.8273,
+      "brier": 0.099,
+      "log_loss": 0.3259,
+      "ece": 0.037,
+      "seconds": 25.4
+     }
+    },
+    "params": {
+     "logistic_regression": {
+      "C": 0.1
+     },
+     "random_forest": {
+      "max_depth": 14,
+      "min_samples_leaf": 30
+     },
+     "hist_gradient_boosting": {
+      "l2_regularization": 1.0,
+      "learning_rate": 0.05,
+      "max_depth": 3
+     },
+     "neural_network": {
+      "alpha": 0.1
+     }
+    }
+   },
+   {
+    "name": "fold 5",
+    "n_train": 202477,
+    "n_test": 50619,
+    "positive_rate_test": 0.1394,
+    "scores": {
+     "logistic_regression": {
+      "roc_auc": 0.8226,
+      "brier": 0.0986,
+      "log_loss": 0.319,
+      "ece": 0.0123,
+      "seconds": 0.9
+     },
+     "random_forest": {
+      "roc_auc": 0.8253,
+      "brier": 0.0986,
+      "log_loss": 0.3237,
+      "ece": 0.0291,
+      "seconds": 22.4
+     },
+     "hist_gradient_boosting": {
+      "roc_auc": 0.8273,
+      "brier": 0.0969,
+      "log_loss": 0.3139,
+      "ece": 0.0026,
+      "seconds": 11.8
+     },
+     "neural_network": {
+      "roc_auc": 0.8274,
+      "brier": 0.0984,
+      "log_loss": 0.3235,
+      "ece": 0.0315,
+      "seconds": 10.8
+     }
+    },
+    "params": {
+     "logistic_regression": {
+      "C": 0.1
+     },
+     "random_forest": {
+      "max_depth": 14,
+      "min_samples_leaf": 30
+     },
+     "hist_gradient_boosting": {
+      "l2_regularization": 1.0,
+      "learning_rate": 0.1,
+      "max_depth": 3
+     },
+     "neural_network": {
+      "alpha": 0.1
+     }
+    }
+   }
+  ]
+ },
+ "chosen_primary": "logistic_regression",
+ "choice_reason": "hist_gradient_boosting scored highest (AUC 0.828) but only 0.006 above logistic_regression, within the 0.01 simplicity margin, so the simpler model is kept.",
+ "pooled_out_of_fold": {
+  "logistic_regression": {
+   "pooled_roc_auc": 0.8214,
+   "calibration_bins": [
+    {
+     "mean_predicted": 0.0102,
+     "observed": 0.0038,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0198,
+     "observed": 0.0107,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.031,
+     "observed": 0.0226,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0461,
+     "observed": 0.0383,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0669,
+     "observed": 0.0667,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0962,
+     "observed": 0.1053,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.1375,
+     "observed": 0.1529,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.1972,
+     "observed": 0.2179,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.2903,
+     "observed": 0.3101,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.4979,
+     "observed": 0.4653,
+     "n": 25309
+    }
+   ],
+   "subgroup_roc_auc": {
+    "women": {
+     "n": 141676,
+     "positive_rate": 0.1296,
+     "roc_auc": 0.8326
+    },
+    "men": {
+     "n": 111420,
+     "positive_rate": 0.1517,
+     "roc_auc": 0.8066
+    },
+    "age 18-44": {
+     "n": 54198,
+     "positive_rate": 0.0405,
+     "roc_auc": 0.8439
+    },
+    "age 45-64": {
+     "n": 142078,
+     "positive_rate": 0.1501,
+     "roc_auc": 0.8186
+    },
+    "age 65+": {
+     "n": 56820,
+     "positive_rate": 0.2067,
+     "roc_auc": 0.7316
+    },
+    "BMI under 25": {
+     "n": 72080,
+     "positive_rate": 0.0568,
+     "roc_auc": 0.8234
+    },
+    "BMI 25-29.9": {
+     "n": 93749,
+     "positive_rate": 0.114,
+     "roc_auc": 0.7968
+    },
+    "BMI 30+": {
+     "n": 87267,
+     "positive_rate": 0.2347,
+     "roc_auc": 0.7737
+    }
+   }
+  },
+  "random_forest": {
+   "pooled_roc_auc": 0.8258,
+   "calibration_bins": [
+    {
+     "mean_predicted": 0.0384,
+     "observed": 0.0041,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.041,
+     "observed": 0.0101,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0449,
+     "observed": 0.0213,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0514,
+     "observed": 0.0379,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0622,
+     "observed": 0.0683,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.08,
+     "observed": 0.1016,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.1081,
+     "observed": 0.1465,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.1628,
+     "observed": 0.2131,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.2688,
+     "observed": 0.3103,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.5354,
+     "observed": 0.4805,
+     "n": 25309
+    }
+   ],
+   "subgroup_roc_auc": {
+    "women": {
+     "n": 141676,
+     "positive_rate": 0.1296,
+     "roc_auc": 0.8367
+    },
+    "men": {
+     "n": 111420,
+     "positive_rate": 0.1517,
+     "roc_auc": 0.8113
+    },
+    "age 18-44": {
+     "n": 54198,
+     "positive_rate": 0.0405,
+     "roc_auc": 0.8488
+    },
+    "age 45-64": {
+     "n": 142078,
+     "positive_rate": 0.1501,
+     "roc_auc": 0.8208
+    },
+    "age 65+": {
+     "n": 56820,
+     "positive_rate": 0.2067,
+     "roc_auc": 0.7411
+    },
+    "BMI under 25": {
+     "n": 72080,
+     "positive_rate": 0.0568,
+     "roc_auc": 0.8259
+    },
+    "BMI 25-29.9": {
+     "n": 93749,
+     "positive_rate": 0.114,
+     "roc_auc": 0.7999
+    },
+    "BMI 30+": {
+     "n": 87267,
+     "positive_rate": 0.2347,
+     "roc_auc": 0.7794
+    }
+   }
+  },
+  "hist_gradient_boosting": {
+   "pooled_roc_auc": 0.8274,
+   "calibration_bins": [
+    {
+     "mean_predicted": 0.005,
+     "observed": 0.0036,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0119,
+     "observed": 0.01,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0224,
+     "observed": 0.0209,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0391,
+     "observed": 0.0383,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0638,
+     "observed": 0.0642,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0992,
+     "observed": 0.1015,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.1465,
+     "observed": 0.1488,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.2112,
+     "observed": 0.214,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.3045,
+     "observed": 0.3088,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.4901,
+     "observed": 0.4835,
+     "n": 25309
+    }
+   ],
+   "subgroup_roc_auc": {
+    "women": {
+     "n": 141676,
+     "positive_rate": 0.1296,
+     "roc_auc": 0.8382
+    },
+    "men": {
+     "n": 111420,
+     "positive_rate": 0.1517,
+     "roc_auc": 0.8131
+    },
+    "age 18-44": {
+     "n": 54198,
+     "positive_rate": 0.0405,
+     "roc_auc": 0.852
+    },
+    "age 45-64": {
+     "n": 142078,
+     "positive_rate": 0.1501,
+     "roc_auc": 0.822
+    },
+    "age 65+": {
+     "n": 56820,
+     "positive_rate": 0.2067,
+     "roc_auc": 0.744
+    },
+    "BMI under 25": {
+     "n": 72080,
+     "positive_rate": 0.0568,
+     "roc_auc": 0.8281
+    },
+    "BMI 25-29.9": {
+     "n": 93749,
+     "positive_rate": 0.114,
+     "roc_auc": 0.8019
+    },
+    "BMI 30+": {
+     "n": 87267,
+     "positive_rate": 0.2347,
+     "roc_auc": 0.7813
+    }
+   }
+  },
+  "neural_network": {
+   "pooled_roc_auc": 0.8259,
+   "calibration_bins": [
+    {
+     "mean_predicted": 0.0407,
+     "observed": 0.0058,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0446,
+     "observed": 0.0127,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0481,
+     "observed": 0.0189,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0532,
+     "observed": 0.0351,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.0622,
+     "observed": 0.0632,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.078,
+     "observed": 0.1027,
+     "n": 25310
+    },
+    {
+     "mean_predicted": 0.1057,
+     "observed": 0.1516,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.1576,
+     "observed": 0.214,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.265,
+     "observed": 0.3088,
+     "n": 25309
+    },
+    {
+     "mean_predicted": 0.5379,
+     "observed": 0.4807,
+     "n": 25309
+    }
+   ],
+   "subgroup_roc_auc": {
+    "women": {
+     "n": 141676,
+     "positive_rate": 0.1296,
+     "roc_auc": 0.8362
+    },
+    "men": {
+     "n": 111420,
+     "positive_rate": 0.1517,
+     "roc_auc": 0.8121
+    },
+    "age 18-44": {
+     "n": 54198,
+     "positive_rate": 0.0405,
+     "roc_auc": 0.8393
+    },
+    "age 45-64": {
+     "n": 142078,
+     "positive_rate": 0.1501,
+     "roc_auc": 0.8208
+    },
+    "age 65+": {
+     "n": 56820,
+     "positive_rate": 0.2067,
+     "roc_auc": 0.7422
+    },
+    "BMI under 25": {
+     "n": 72080,
+     "positive_rate": 0.0568,
+     "roc_auc": 0.8224
+    },
+    "BMI 25-29.9": {
+     "n": 93749,
+     "positive_rate": 0.114,
+     "roc_auc": 0.8006
+    },
+    "BMI 30+": {
+     "n": 87267,
+     "positive_rate": 0.2347,
+     "roc_auc": 0.7795
+    }
+   }
+  }
+ },
+ "run": {
+  "quick": false,
+  "minutes": 5.4,
+  "seed": 42
+ }
+}

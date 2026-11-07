@@ -1,5 +1,5 @@
 export type ContentKind = "measured" | "ai_estimate" | "hypothetical" | "cohort_comparison";
-export type Condition = "diabetes" | "heart_disease";
+export type Condition = "diabetes" | "heart_disease" | "diabetes_survey";
 export type RiskBand = "low" | "moderate" | "high";
 
 export interface Driver {
@@ -58,6 +58,12 @@ export interface EvalMetrics {
   permutation_importance: { feature: string; mean_auc_drop: number; std: number }[];
   trust_meter_on_test: { mean_bootstrap_range_width: number; mean_lr_rf_disagreement_pp: number; share_disagreeing_over_10pp: number };
   data: { rows: number; positives: number; zeros_treated_as_missing: Record<string, number> };
+  /** Present on version-2 models, which are scored by nested cross-validation instead of one split. */
+  evaluation_basis?: string;
+  nested_cv?: Record<string, Record<"roc_auc" | "brier" | "log_loss" | "ece", { mean: number; std: number }> & { auc_gain_vs_logistic: { mean: number; std: number; folds_better: number; folds: number } }>;
+  nested_cv_design?: { outer: string; inner: string };
+  subgroup_roc_auc?: Record<string, { n: number; positive_rate: number; roc_auc: number }>;
+  external_validation?: { leave_one_hospital_out?: Record<string, { n: number; positive_rate: number; roc_auc: Record<string, number> }> | null };
 }
 export interface EvalItem {
   condition: Condition; version: string; primary_algorithm: string; metrics: EvalMetrics; model_card_markdown: string;

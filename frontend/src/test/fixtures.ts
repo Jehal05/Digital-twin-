@@ -13,7 +13,7 @@ export const prediction: Prediction = {
 
 export const dashboard = (over: Partial<DashboardData> = {}): DashboardData => ({
   profile: { content_kind: "measured", email: "a@example.com", display_name: "Asha", date_of_birth: "1988-05-01", age: 38, sex: "female", height_cm: 165, bmi: null },
-  latest_measurements: {}, trend_series: {}, latest_predictions: { diabetes: null, heart_disease: null },
+  latest_measurements: {}, trend_series: {}, latest_predictions: { diabetes: null, heart_disease: null, diabetes_survey: null },
   scenario_count: 0, flagged_count: 0, models_available: ["diabetes"], ...over,
 });
 

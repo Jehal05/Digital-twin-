@@ -95,13 +95,13 @@ def test_model_versions_are_synced_to_the_database(client):
     from app.models.tables import ModelVersion
     with client.app.state.sessionmaker() as db:
         rows = db.scalars(select(ModelVersion)).all()
-    assert [(r.condition, r.version, r.is_active) for r in rows] == [("diabetes", "1.0.0", True), ("heart_disease", "1.0.0", True)]
+    assert sorted((r.condition, r.version, r.is_active) for r in rows) == [("diabetes", "1.0.0", True), ("diabetes_survey", "1.0.0", True), ("heart_disease", "2.0.0", True)]
     assert all("sha256" in r.dataset_ref and r.metrics["primary_algorithm"] == "logistic_regression" for r in rows)
 
 
 def test_evaluation_endpoint_serves_metrics_without_internal_split_indices(user):
     r = user.get("/models/evaluation").json()
-    assert {i["condition"] for i in r["items"]} == {"diabetes", "heart_disease"} and r["unavailable"] == []
+    assert {i["condition"] for i in r["items"]} == {"diabetes", "diabetes_survey", "heart_disease"} and r["unavailable"] == []
     for item in r["items"]:
         assert "test_index" not in item["metrics"]["split"] and "Limitations" in item["model_card_markdown"]
 
@@ -120,3 +120,32 @@ def test_a_fasting_glucose_is_never_used_as_the_two_hour_value(user):
     r = user.post("/predictions/diabetes", {"use_latest": True, "features": {"pregnancies": 1, "blood_pressure": 70, "bmi": 28, "age": 40}})
     assert r.status_code == 422 and r.json()["error"]["code"] == "missing_inputs"
     assert "2-hour" in r.json()["error"]["fields"]["glucose"]
+
+
+SURVEY = {"high_bp": 1, "high_chol": 1, "bmi": 33, "smoker": 1, "stroke": 0, "heart_disease_or_attack": 0, "physical_activity": 0,
+          "fruit_daily": 0, "veg_daily": 1, "heavy_alcohol": 0, "general_health": 4, "mental_health_days": 5, "physical_health_days": 10,
+          "difficulty_walking": 1, "sex": 1, "age_band": 10}
+
+
+def test_survey_model_gives_a_labelled_estimate_and_responds_sensibly(user):
+    hi = user.post("/predictions/diabetes-survey", {"features": SURVEY})
+    assert hi.status_code == 201, hi.text
+    body = hi.json()
+    assert body["condition"] == "diabetes_survey" and body["content_kind"] == "ai_estimate" and 0 < body["score"] < 1
+    lo = user.post("/predictions/diabetes-survey", {"features": {**SURVEY, "high_bp": 0, "high_chol": 0, "bmi": 22, "general_health": 1,
+                                                               "difficulty_walking": 0, "physical_health_days": 0, "age_band": 4}})
+    assert lo.json()["score"] < body["score"]
+    assert len(body["trust"]["model_agreement"]["models"]) == 4 and body["trust"]["uncertainty_range"]["low"] <= body["score"] <= body["trust"]["uncertainty_range"]["high"]
+
+
+def test_survey_model_rejects_out_of_range_inputs(user):
+    r = user.post("/predictions/diabetes-survey", {"features": {**SURVEY, "age_band": 40}})
+    assert r.status_code == 422
+
+
+def test_survey_goal_planner_only_changes_habits(user):
+    p = user.post("/predictions/diabetes-survey", {"features": SURVEY}).json()
+    r = user.post("/scenarios/goal-plan", {"condition": "diabetes_survey", "baseline_prediction_id": p["id"], "target_score": round(p["score"] - 0.03, 3)})
+    assert r.status_code == 200, r.text
+    allowed = {"bmi", "smoker", "physical_activity", "fruit_daily", "veg_daily", "heavy_alcohol"}
+    assert set(r.json()["changes"]) <= allowed

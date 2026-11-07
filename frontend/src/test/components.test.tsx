@@ -57,7 +57,7 @@ describe("EstimateForm", () => {
 
 describe("DigitalTwin", () => {
   it("summarises estimates in text for screen readers and marks the untrained model", () => {
-    render(<DigitalTwin predictions={{ diabetes: prediction, heart_disease: null }} available={["diabetes"]} onSelect={() => {}} onRun={() => {}} />);
+    render(<DigitalTwin predictions={{ diabetes: prediction, heart_disease: null, diabetes_survey: null }} available={["diabetes"]} onSelect={() => {}} onRun={() => {}} />);
     const s = screen.getByTestId("twin-summary").textContent!;
     expect(s).toContain("Diabetes: 32%"); expect(s).toContain("Heart disease: model not available");
     expect(screen.getByText(/symbolic/i)).toBeInTheDocument();

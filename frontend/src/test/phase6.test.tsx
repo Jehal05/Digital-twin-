@@ -18,7 +18,7 @@ function mockFetch(...handlers: Handler[]) {
   vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
     calls.push({ url, init });
     for (const h of handlers) { const r = await h(url, init); if (r) return r; }
-    if (url.endsWith("/dashboard")) return json(dashboard({ latest_predictions: { diabetes: prediction, heart_disease: null } }));
+    if (url.endsWith("/dashboard")) return json(dashboard({ latest_predictions: { diabetes: prediction, heart_disease: null, diabetes_survey: null } }));
     return json({ error: { code: "not_found", message: "nope", fields: {} } }, 404);
   }));
   return calls;

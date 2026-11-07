@@ -33,7 +33,7 @@ describe("SimulatorPage", () => {
     const calls: { url: string; init?: RequestInit }[] = [];
     vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
       calls.push({ url, init });
-      if (url.endsWith("/dashboard")) return json(dashboard({ latest_predictions: { diabetes: prediction, heart_disease: null } }));
+      if (url.endsWith("/dashboard")) return json(dashboard({ latest_predictions: { diabetes: prediction, heart_disease: null, diabetes_survey: null } }));
       if (url.includes("/scenarios?")) return json({ items: [] });
       if (url.endsWith("/scenarios") && init?.method === "POST") return json(scenario, 201);
       return json({}, 404);
@@ -75,7 +75,7 @@ describe("SimulatorPage for heart disease", () => {
     const calls: { url: string; init?: RequestInit }[] = [];
     vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
       calls.push({ url, init });
-      if (url.endsWith("/dashboard")) return json(dashboard({ models_available: ["diabetes", "heart_disease"], latest_predictions: { diabetes: prediction, heart_disease: heart } }));
+      if (url.endsWith("/dashboard")) return json(dashboard({ models_available: ["diabetes", "heart_disease"], latest_predictions: { diabetes: prediction, heart_disease: heart, diabetes_survey: null } }));
       if (url.includes("/scenarios?")) return json({ items: [] });
       if (url.endsWith("/scenarios") && init?.method === "POST") return json({ id: "s", content_kind: "hypothetical", kind: "what_if", name: "x", condition: "heart_disease", target_score: null, changed_inputs: { trestbps: 130 }, baseline: heart, scenario: { ...heart, id: "h2", score: 0.5 }, delta_pp: -10, note: "n", created_at: "" }, 201);
       return json({}, 404);

@@ -43,8 +43,13 @@ def heart(body: PredictIn, request: Request, user: User = Depends(current_user),
     return _predict("heart_disease", body, request, user, db)
 
 
+@router.post("/diabetes-survey", status_code=201)
+def diabetes_survey(body: PredictIn, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return _predict("diabetes_survey", body, request, user, db)
+
+
 @router.get("/history")
-def history(request: Request, condition: str | None = Query(None, pattern="^(diabetes|heart_disease)$"),
+def history(request: Request, condition: str | None = Query(None, pattern="^(diabetes|heart_disease|diabetes_survey)$"),
             date_from: datetime | None = Query(None, alias="from"), date_to: datetime | None = Query(None, alias="to"),
             limit: int = Query(100, ge=1, le=500), user: User = Depends(current_user),
             db: Session = Depends(get_db)):

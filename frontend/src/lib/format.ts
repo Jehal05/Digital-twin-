@@ -35,13 +35,24 @@ const FEATURE_LABEL: Record<string, string> = {
   glucose: "2-hour glucose", bmi: "Body mass index", blood_pressure: "Diastolic blood pressure", age: "Age", pregnancies: "Pregnancies",
   sex: "Sex", cp: "Chest pain type", trestbps: "Resting systolic blood pressure", chol: "Serum cholesterol", fbs: "Fasting blood sugar above 120",
   restecg: "Resting ECG", thalach: "Max heart rate in stress test", exang: "Exercise-induced chest pain", oldpeak: "ST depression in stress test",
+  high_bp: "High blood pressure", high_chol: "High cholesterol", smoker: "Smoked 100+ cigarettes", stroke: "Past stroke",
+  heart_disease_or_attack: "Heart disease or attack", physical_activity: "Physical activity", fruit_daily: "Daily fruit",
+  veg_daily: "Daily vegetables", heavy_alcohol: "Heavy drinking", general_health: "General health",
+  mental_health_days: "Poor mental health days", physical_health_days: "Poor physical health days",
+  difficulty_walking: "Difficulty walking", age_band: "Age group",
 };
+const YN = { 0: "No", 1: "Yes" };
+const AGE_BANDS = ["18 to 24", "25 to 29", "30 to 34", "35 to 39", "40 to 44", "45 to 49", "50 to 54", "55 to 59", "60 to 64", "65 to 69", "70 to 74", "75 to 79", "80 or older"];
 const CATEGORY_WORDS: Record<string, Record<number, string>> = {
   sex: { 1: "Male", 0: "Female" },
   cp: { 1: "Typical angina", 2: "Atypical angina", 3: "Non-anginal pain", 4: "No chest pain (asymptomatic)" },
   fbs: { 0: "No", 1: "Yes" },
   restecg: { 0: "Normal", 1: "ST-T wave abnormality", 2: "Left ventricular hypertrophy" },
   exang: { 0: "No", 1: "Yes" },
+  high_bp: YN, high_chol: YN, smoker: YN, stroke: YN, heart_disease_or_attack: YN, physical_activity: YN, fruit_daily: YN,
+  veg_daily: YN, heavy_alcohol: YN, difficulty_walking: YN,
+  general_health: { 1: "Excellent", 2: "Very good", 3: "Good", 4: "Fair", 5: "Poor" },
+  age_band: Object.fromEntries(AGE_BANDS.map((t, i) => [i + 1, t])),
 };
 export const featureLabel = (feature: string, fallback = feature) => FEATURE_LABEL[feature] ?? fallback;
 export function featureValue(feature: string, value: number, unit = ""): string {

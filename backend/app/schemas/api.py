@@ -74,13 +74,13 @@ class PredictIn(Strict):
 
 class ScenarioIn(Strict):
     name: str = Field(min_length=1, max_length=80)
-    condition: Literal["diabetes", "heart_disease"]
+    condition: Literal["diabetes", "heart_disease", "diabetes_survey"]
     baseline_prediction_id: uuid.UUID
     changed_inputs: dict[str, float] = Field(min_length=1)
 
 
 class GoalPlanIn(Strict):
-    condition: Literal["diabetes", "heart_disease"]
+    condition: Literal["diabetes", "heart_disease", "diabetes_survey"]
     baseline_prediction_id: uuid.UUID
     target_score: float = Field(gt=0.01, lt=0.99, description="probability the estimate should fall below, e.g. 0.20")
     locked_inputs: list[str] = Field(default_factory=list, max_length=10)

@@ -77,9 +77,9 @@ class HealthTwinModel:
         return "low" if p < lo else "moderate" if p < hi else "high"
 
     def _trust(self, X: pd.DataFrame, p: float) -> dict:
-        lr = float(self.b["models"]["logistic_regression"].predict_proba(X)[0, 1])
-        rf = float(self.b["models"]["random_forest"].predict_proba(X)[0, 1])
-        diff = abs(lr - rf) * 100
+        probs = {a: float(m.predict_proba(X)[0, 1]) for a, m in self.b["models"].items()}
+        diff = (max(probs.values()) - min(probs.values())) * 100          # widest gap between any two model families
+        lr, rf = probs.get("logistic_regression", p), probs.get("random_forest", p)
         boot = np.array([m.predict_proba(X)[0, 1] for m in self.b["bootstrap"]])
         low, high = np.percentile(boot, [5, 95])
         ood = []
@@ -90,6 +90,7 @@ class HealthTwinModel:
                     ood.append({"feature": name, "value": v, "training_range": [st["min"], st["max"]]})
         return {
             "model_agreement": {"logistic_regression": round(lr, 4), "random_forest": round(rf, 4),
+                                "models": {a: round(v, 4) for a, v in probs.items()},
                                 "difference_pp": round(diff, 1),
                                 "level": "high" if diff < 5 else "medium" if diff < 10 else "low"},
             "uncertainty_range": {"low": round(float(min(low, p)), 4), "high": round(float(max(high, p)), 4),

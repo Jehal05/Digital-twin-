@@ -13,6 +13,12 @@ import pandas as pd
 REALISTIC = {
     "diabetes": {"glucose": (40.0, 70.0), "bmi": (5.0, 18.5), "blood_pressure": (15.0, 60.0)},
     "heart_disease": {"trestbps": (30.0, 90.0), "chol": (60.0, 125.0)},
+    "diabetes_survey": {"bmi": (5.0, 18.5)},
+}
+# yes/no habits the planner may flip, with the value that is the "healthier" answer. Each flip costs as much as the largest
+# continuous change, so the plan prefers fewer changes. The data only show association, never that a habit change causes a result.
+HABITS = {
+    "diabetes_survey": {"physical_activity": 1.0, "fruit_daily": 1.0, "veg_daily": 1.0, "smoker": 0.0, "heavy_alcohol": 0.0},
 }
 STEPS = 11
 NOTE = ("Model-suggested hypothetical. It shows what changes to these inputs would move this model's estimate below your "
@@ -21,11 +27,15 @@ NOTE = ("Model-suggested hypothetical. It shows what changes to these inputs wou
 
 def plan(model, condition: str, baseline: dict, target: float, locked: set[str]) -> dict:
     limits = REALISTIC[condition]
-    free = [f for f in model.editable_features() if f in limits and f not in locked]
+    habits = HABITS.get(condition, {})
+    free = [f for f in model.editable_features() if (f in limits or f in habits) and f not in locked]
     axes: dict[str, np.ndarray] = {}
     for f in free:
-        max_dec, floor = limits[f]
         start = float(baseline[f])
+        if f in habits:
+            axes[f] = np.array([start, habits[f]]) if start != habits[f] else np.array([start])
+            continue
+        max_dec, floor = limits[f]
         lowest = max(floor, start - max_dec)
         axis = np.round(np.linspace(start, lowest, STEPS), 1) if lowest < start else np.array([start])
         axis[0] = start  # step 0 is exactly "no change", never a rounded copy of it
@@ -36,7 +46,7 @@ def plan(model, condition: str, baseline: dict, target: float, locked: set[str])
     scores = model.score_batch(rows)
     cost = np.zeros(len(rows))
     for f in free:
-        cost += (float(baseline[f]) - rows[f].to_numpy()) / limits[f][0]
+        cost += (rows[f].to_numpy() != float(baseline[f])) * 1.0 if f in habits else (float(baseline[f]) - rows[f].to_numpy()) / limits[f][0]
 
     feasible = np.where(scores <= target)[0]
     pick = None
@@ -52,7 +62,7 @@ def plan(model, condition: str, baseline: dict, target: float, locked: set[str])
         "changes": changes,
         "estimated_score": round(float(scores[chosen]), 4),
         "candidates_evaluated": int(len(rows)),
-        "constraints": {f: {"max_decrease": limits[f][0], "floor": limits[f][1]} for f in free},
+        "constraints": {f: ({"change_to": habits[f]} if f in habits else {"max_decrease": limits[f][0], "floor": limits[f][1]}) for f in free},
         "locked_inputs": sorted(locked),
         "note": NOTE,
     }

@@ -107,3 +107,55 @@ HEART = Condition(
 )
 
 CONDITIONS = {DIABETES.key: DIABETES, HEART.key: HEART}
+
+# ---- Version 2 models, trained on larger data and evaluated with nested cross-validation (see src/advanced.py) ----
+HEART_V2 = Condition(
+    key="heart_disease",
+    title="Heart disease",
+    dataset="UCI Heart Disease, all four hospitals (Cleveland, Hungary, Switzerland, VA Long Beach), 920 patients",
+    raw_file="uci_heart",
+    outcome_definition="Angiographic heart disease (any vessel narrowing) found at the time of testing, not future heart attack risk.",
+    population_note=(
+        "Training data covers 920 patients referred for coronary angiography at four hospitals in the 1980s (USA, Hungary, "
+        "Switzerland). Switzerland and the VA sample are almost all men with a high disease rate. It is not a general-population sample."
+    ),
+    features=HEART.features,
+    sensitivity_sets={},
+)
+
+SURVEY = Condition(
+    key="diabetes_survey",
+    title="Diabetes (lifestyle survey model)",
+    dataset="CDC Behavioral Risk Factor Surveillance System (BRFSS) 2015, 253,096 US adult respondents",
+    raw_file="brfss",
+    outcome_definition="Respondent reports having been told by a doctor that they have diabetes (not prediabetes), at the time of the survey.",
+    population_note=(
+        "Training data covers US adults who answered a 2015 telephone health survey. All answers are self-reported. It describes who "
+        "already reports a diabetes diagnosis, so it cannot find undiagnosed diabetes, and it is not validated outside the US."
+    ),
+    features=(
+        Feature("high_bp", "Told you have high blood pressure (1 = yes)", "", "binary", 0, 1),
+        Feature("high_chol", "Told you have high cholesterol (1 = yes)", "", "binary", 0, 1),
+        Feature("bmi", "Body mass index", "kg/m2", "continuous", 12, 70, editable=True),
+        Feature("smoker", "Smoked at least 100 cigarettes in your life (1 = yes)", "", "binary", 0, 1, editable=True),
+        Feature("stroke", "Ever told you had a stroke (1 = yes)", "", "binary", 0, 1),
+        Feature("heart_disease_or_attack", "Ever told you had coronary heart disease or a heart attack (1 = yes)", "", "binary", 0, 1),
+        Feature("physical_activity", "Any physical activity in the past 30 days outside work (1 = yes)", "", "binary", 0, 1, editable=True),
+        Feature("fruit_daily", "Eat fruit at least once a day (1 = yes)", "", "binary", 0, 1, editable=True),
+        Feature("veg_daily", "Eat vegetables at least once a day (1 = yes)", "", "binary", 0, 1, editable=True),
+        Feature("heavy_alcohol", "Heavy drinker (men over 14, women over 7 drinks a week) (1 = yes)", "", "binary", 0, 1, editable=True),
+        Feature("general_health", "General health (1 excellent, 2 very good, 3 good, 4 fair, 5 poor)", "", "integer", 1, 5),
+        Feature("mental_health_days", "Days of poor mental health in the past 30", "days", "integer", 0, 30),
+        Feature("physical_health_days", "Days of poor physical health in the past 30", "days", "integer", 0, 30),
+        Feature("difficulty_walking", "Serious difficulty walking or climbing stairs (1 = yes)", "", "binary", 0, 1),
+        Feature("sex", "Sex (1 = male, 0 = female)", "", "binary", 0, 1),
+        Feature("age_band", "Age group (1 = 18-24, 2 = 25-29, ... 12 = 75-79, 13 = 80 or older)", "", "integer", 1, 13),
+    ),
+    sensitivity_sets={},
+)
+
+BRFSS_RENAME = {"HighBP": "high_bp", "HighChol": "high_chol", "BMI": "bmi", "Smoker": "smoker", "Stroke": "stroke",
+                "HeartDiseaseorAttack": "heart_disease_or_attack", "PhysActivity": "physical_activity", "Fruits": "fruit_daily",
+                "Veggies": "veg_daily", "HvyAlcoholConsump": "heavy_alcohol", "GenHlth": "general_health",
+                "MentHlth": "mental_health_days", "PhysHlth": "physical_health_days", "DiffWalk": "difficulty_walking",
+                "Sex": "sex", "Age": "age_band"}
