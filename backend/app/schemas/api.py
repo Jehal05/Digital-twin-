@@ -92,6 +92,11 @@ class CounterfactualIn(Strict):
     locked_inputs: list[str] = Field(default_factory=list, max_length=10)
 
 
+class FuturesIn(Strict):
+    condition: Literal["diabetes", "heart_disease", "diabetes_survey"]
+    baseline_prediction_id: uuid.UUID
+
+
 class PreferencesIn(Strict):
     locale: Literal["en", "hi"] | None = None
     theme: Literal["light", "dark", "system"] | None = None

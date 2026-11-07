@@ -12,6 +12,8 @@ import { CardTitle, Glass } from "../components/ui/Glass";
 import { EmptyState, ErrorState, Skeleton } from "../components/ui/States";
 import { Button } from "../components/ui/Button";
 import { CheckNext, Counterfactual } from "../components/dashboard/NextSteps";
+import { IconArray } from "../components/dashboard/IconArray";
+import { Futures } from "../components/dashboard/Futures";
 
 const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: ["age", "trestbps", "chol", "thalach", "oldpeak"],
   diabetes_survey: ["bmi", "age_band", "physical_health_days", "mental_health_days"] };
@@ -78,7 +80,7 @@ export function RiskDetailPage() {
     <div aria-busy={loading}>
       {tabs}
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-4"><RiskGauge p={p} /><Cohort condition={condition} snapshot={p.input_snapshot} /></div>
+        <div className="space-y-4"><RiskGauge p={p} /><IconArray p={p} /><Cohort condition={condition} snapshot={p.input_snapshot} /></div>
         <Glass className="h-fit p-5" aria-label="Explanation">
           <CardTitle aside={<ContentTag kind="ai_estimate" />}>How the estimate is built</CardTitle>
           <p className="mb-3 text-sm text-muted">Starting from the study average, each input moves the estimate up or down. Values are percentage points.</p>
@@ -88,6 +90,7 @@ export function RiskDetailPage() {
         </Glass>
         <CheckNext p={p} />
         <Counterfactual p={p} condition={condition} />
+        <Futures p={p} condition={condition} />
       </div>
     </div>
   );

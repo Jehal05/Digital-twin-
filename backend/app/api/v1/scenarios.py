@@ -10,7 +10,8 @@ from app.core.db import get_db
 from app.core.errors import ApiError
 from app.core.security import audit, current_user
 from app.models.tables import Prediction, SimulationScenario, User
-from app.schemas.api import CounterfactualIn, GoalPlanIn, ScenarioIn
+from app.schemas.api import CounterfactualIn, FuturesIn, GoalPlanIn, ScenarioIn
+from app.services import futures as futures_svc
 from app.services import goal_planner
 from app.services.predictions import iso, prediction_out, run_and_store
 
@@ -114,6 +115,14 @@ def counterfactual(body: CounterfactualIn, request: Request, user: User = Depend
     sc = _save(db, request, user, reg, name=f"Lower band ({out['target_band']})", kind="goal_plan", condition=body.condition,
                base=base, changes=result["changes"], target=target)
     return {**out, "scenario": scenario_out(db, reg, sc)}
+
+
+@router.post("/futures")
+def futures(body: FuturesIn, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Twin Futures: carry on as now vs improve habits, six months, hypothetical. Not stored."""
+    reg = request.app.state.registry
+    base = _baseline(db, user, reg, body.condition, body.baseline_prediction_id)
+    return futures_svc.build(db, user.id, reg.get(body.condition), body.condition, base.input_snapshot, base.score)
 
 
 @router.get("")

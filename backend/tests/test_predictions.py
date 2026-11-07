@@ -196,3 +196,27 @@ def test_applicability_flags_people_unlike_the_training_data(user):
     assert typical["level"] == "typical" and typical["confidence_multiplier"] == 1.0
     odd = user.post("/predictions/diabetes", {"features": {**PROFILE, "age": 80, "bmi": 60, "pregnancies": 0}}).json()["trust"]["applicability"]
     assert odd["level"] in {"unusual", "outside"} and odd["reasons"] and odd["confidence_multiplier"] < 1
+
+
+def test_twin_futures_are_hypothetical_monthly_model_scores(user):
+    hi = user.post("/predictions/diabetes-survey", {"features": SURVEY}).json()
+    r = user.post("/scenarios/futures", {"condition": "diabetes_survey", "baseline_prediction_id": hi["id"]})
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert b["content_kind"] == "hypothetical" and b["months"] == 6 and "not predictions" in b["note"]
+    assert len(b["carry_on"]["scores"]) == 7 and len(b["improve"]["scores"]) == 7
+    assert b["carry_on"]["scores"][0] == b["improve"]["scores"][0] == hi["score"]          # both start at the real baseline
+    assert b["carry_on"]["scores"] == [hi["score"]] * 7                                      # no measurements -> held constant
+    assert b["improve"]["scores"][-1] < hi["score"] and b["improve"]["changes"]
+
+
+def test_twin_futures_follow_the_persons_own_measured_trend(user):
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now(timezone.utc)
+    for i, bmi in enumerate([31.0, 32.0, 33.0, 34.0]):          # BMI rising 1 point per 10 days
+        r = user.post("/measurements", {"measurement_type": "bmi", "value": bmi, "unit": "kg/m2", "recorded_at": (now - timedelta(days=30 - 10 * i)).isoformat()})
+        assert r.status_code in (200, 201), r.text
+    p = user.post("/predictions/diabetes-survey", {"features": {**SURVEY, "bmi": 34}}).json()
+    b = user.post("/scenarios/futures", {"condition": "diabetes_survey", "baseline_prediction_id": p["id"]}).json()
+    assert b["carry_on"]["scores"][-1] > b["carry_on"]["scores"][0]                         # worsening trend is carried forward
+    assert any("trend" in a["assumption"] for a in b["carry_on"]["assumptions"])
