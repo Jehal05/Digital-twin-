@@ -58,6 +58,19 @@ function Metrics({ item }: { item: EvalItem }) {
                 <td className="num">{r.n}</td><td className="num">{pct1(r.positive_rate)}</td><td className="num">{f3(r.roc_auc[m.primary_algorithm])}</td></tr>))}</tbody></table></div></>)}
         </Glass>)}
 
+      {m.uncertainty && (
+        <Glass className="p-5 lg:col-span-2" aria-label="Uncertainty guarantee">
+          <CardTitle>How sure is each estimate? (conformal prediction)</CardTitle>
+          <p className="mb-2 text-sm text-muted">Each estimate comes with a set of plausible outcomes. The promise: for people like the training data, the true outcome is in the set at least {pct1(1 - m.uncertainty.alpha)} of the time, separately for people with and without the outcome. The check below tests that promise instead of assuming it.</p>
+          <p className="num text-sm">Measured coverage {pct1(m.uncertainty.coverage_random_half.coverage.mean)} (± {pct1(m.uncertainty.coverage_random_half.coverage.std)}) · with outcome {pct1(m.uncertainty.coverage_random_half.coverage_if_outcome_present.mean)} · without {pct1(m.uncertainty.coverage_random_half.coverage_if_outcome_absent.mean)}</p>
+          <p className="num text-sm">{pct1(m.uncertainty.coverage_random_half.share_decided.mean)} of people get a single answer; {pct1(m.uncertainty.coverage_random_half.share_undecided.mean)} are "too close to call". Typical probability range width {pct1(m.uncertainty.venn_abers_width.mean_width)}.</p>
+          {m.uncertainty.coverage_leave_one_hospital_out && (
+            <div className="mt-3 overflow-x-auto"><table className="w-full text-left text-sm"><caption className="mb-1 text-left text-xs text-muted">When the population changes, the promise weakens: calibrate on three hospitals, test on the fourth</caption>
+              <thead><tr className="text-xs text-muted"><th className="py-1">Hospital</th><th>Patients</th><th>Coverage</th><th>With outcome</th><th>Without</th></tr></thead>
+              <tbody>{Object.entries(m.uncertainty.coverage_leave_one_hospital_out).map(([h, r]) => (<tr key={h} className="border-t border-line"><td className="py-1.5 font-medium capitalize">{h}</td>
+                <td className="num">{r.n}</td><td className="num">{pct1(r.coverage)}</td><td className="num">{pct1(r.coverage_if_outcome_present)}</td><td className="num">{pct1(r.coverage_if_outcome_absent)}</td></tr>))}</tbody></table></div>)}
+        </Glass>)}
+
       <Glass className="p-5" aria-label="Errors at the operating threshold">
         <CardTitle>What the mistakes look like</CardTitle>
         <p className="mb-2 text-sm text-muted">At the cut-off {pct1(op.threshold)} (chosen on training data), out of {m.split.test_rows} test rows:</p>
@@ -90,7 +103,7 @@ function Metrics({ item }: { item: EvalItem }) {
           <li>{m.data.rows} rows, {m.data.positives} with the outcome.</li>
           {Object.entries(m.data.zeros_treated_as_missing).filter(([, n]) => n > 0).map(([k, n]) => <li key={k}>{n} impossible zero values in {k} were treated as missing, then imputed inside each training fold.</li>)}
           <li>On average the two models differ by {m.trust_meter_on_test.mean_lr_rf_disagreement_pp.toFixed(1)} points; {pct1(m.trust_meter_on_test.share_disagreeing_over_10pp)} of test cases differ by more than 10.</li>
-          <li>Typical model range width: {(m.trust_meter_on_test.mean_bootstrap_range_width * 100).toFixed(1)} points. This is model variability, not a confidence interval.</li>
+          <li>Typical {m.uncertainty ? "probability range" : "model range"} width: {(m.trust_meter_on_test.mean_bootstrap_range_width * 100).toFixed(1)} points. {m.uncertainty ? "A wide range means the data cannot pin the number down." : "This is model variability, not a confidence interval."}</li>
         </ul>
         <details className="mt-3 text-sm"><summary className="cursor-pointer font-medium text-brand">Full model card</summary>
           <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl bg-dim p-3 text-xs">{item.model_card_markdown}</pre></details>

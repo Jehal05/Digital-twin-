@@ -13,7 +13,7 @@ Keep your health history in one place, get diabetes and heart disease estimates 
 - Share links store only a hash, are revocable, and expired/revoked/unknown links look identical.
 
 ## Features
-Dashboard (gauge, Why, Digital Twin) · risk details with cohort percentile · What-If Simulator · Goal Planner · scenario comparison · Trends and Time Machine · Model Reliability / Trust Meter · lab-report OCR and wearable CSV import · doctor report with share link · privacy (export, consent, delete) · dark mode · English and Hindi (shell, auth, safety notices, settings; other screens still English) · installable PWA (shell only, never caches API data) · Ctrl/⌘+K command palette · axe-clean in light and dark.
+Dashboard (gauge, Why, Digital Twin) · risk details with cohort percentile · What-If Simulator · Goal Planner · scenario comparison · Trends and Time Machine · Model Reliability / Trust Meter · conformal 90% reliability check and Venn-Abers probability ranges (see `ml/src/conformal.py`) · lab-report OCR and wearable CSV import · doctor report with share link · privacy (export, consent, delete) · dark mode · English and Hindi (shell, auth, safety notices, settings; other screens still English) · installable PWA (shell only, never caches API data) · Ctrl/⌘+K command palette · axe-clean in light and dark.
 
 ## Quick start
 ```bash

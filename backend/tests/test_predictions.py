@@ -10,9 +10,13 @@ NOW = datetime.now(timezone.utc)
 def test_prediction_comes_from_the_real_model_with_labels(user, baseline):
     b = baseline
     assert 0 < b["score"] < 1 and b["risk_band"] in {"low", "moderate", "high"}
-    assert b["content_kind"] == "ai_estimate" and b["model"]["version"] == "1.0.0"
+    assert b["content_kind"] == "ai_estimate" and b["model"]["version"] == "2.0.0"
     assert any("not a diagnosis" in s for s in b["limitations"])
     assert b["trust"]["uncertainty_range"]["low"] <= b["score"] <= b["trust"]["uncertainty_range"]["high"]
+    assert b["trust"]["uncertainty_range"]["method"] == "venn_abers"
+    c = b["trust"]["conformal"]
+    assert c["coverage"] == 0.9 and c["verdict"] in {"higher", "lower", "undecided", "unusual"} and "averaged over people" in c["guarantee"]
+    assert set(c["outcome_set"]) <= {0, 1}
     assert b["explanation"]["top_drivers"][0]["feature"] == "glucose"
     assert b["input_snapshot"]["glucose"] == 140.0
 
@@ -95,7 +99,7 @@ def test_model_versions_are_synced_to_the_database(client):
     from app.models.tables import ModelVersion
     with client.app.state.sessionmaker() as db:
         rows = db.scalars(select(ModelVersion)).all()
-    assert sorted((r.condition, r.version, r.is_active) for r in rows) == [("diabetes", "1.0.0", True), ("diabetes_survey", "1.0.0", True), ("heart_disease", "2.0.0", True)]
+    assert sorted((r.condition, r.version, r.is_active) for r in rows) == [("diabetes", "2.0.0", True), ("diabetes_survey", "1.1.0", True), ("heart_disease", "2.1.0", True)]
     assert all("sha256" in r.dataset_ref and r.metrics["primary_algorithm"] == "logistic_regression" for r in rows)
 
 
@@ -149,3 +153,9 @@ def test_survey_goal_planner_only_changes_habits(user):
     assert r.status_code == 200, r.text
     allowed = {"bmi", "smoker", "physical_activity", "fruit_daily", "veg_daily", "heavy_alcohol"}
     assert set(r.json()["changes"]) <= allowed
+
+
+def test_extreme_low_risk_inputs_are_decided_and_borderline_inputs_are_not_hidden(user):
+    low = user.post("/predictions/diabetes-survey", {"features": {**SURVEY, "high_bp": 0, "high_chol": 0, "bmi": 20, "general_health": 1,
+                    "difficulty_walking": 0, "physical_health_days": 0, "age_band": 2, "smoker": 0, "physical_activity": 1}}).json()
+    assert low["trust"]["conformal"]["verdict"] in {"lower", "undecided"} and low["trust"]["conformal"]["verdict"] != "higher"

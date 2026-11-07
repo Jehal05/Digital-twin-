@@ -50,13 +50,20 @@ export function RiskGauge({ p }: { p: Prediction }) {
       {t && (
         <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
           <div className="panel-dim p-3">
-            <dt className="text-xs text-muted">Model range (not a confidence interval)</dt>
+            <dt className="text-xs text-muted">{t.uncertainty_range.method === "venn_abers" ? "Probability range (not a confidence interval)" : "Model range (not a confidence interval)"}</dt>
             <dd className="num font-semibold">{pct(t.uncertainty_range.low)} to {pct(t.uncertainty_range.high)}</dd>
           </div>
           <div className="panel-dim p-3">
             <dt className="text-xs text-muted">Two models agree</dt>
             <dd className="font-semibold"><span className="capitalize">{t.model_agreement.level}</span> <span className="num font-normal text-muted">({t.model_agreement.difference_pp.toFixed(0)} pts apart)</span></dd>
           </div>
+          {t.conformal && (
+            <div className="panel-dim col-span-2 p-3" data-testid="conformal">
+              <dt className="text-xs text-muted">{Math.round(t.conformal.coverage * 100)}% reliability check</dt>
+              <dd className="font-semibold">{t.conformal.verdict === "undecided" ? "Too close to call" : t.conformal.verdict === "higher" ? "Points to higher" : t.conformal.verdict === "lower" ? "Points to lower" : "Unusual inputs"}</dd>
+              <dd className="mt-0.5 text-xs text-muted">{t.conformal.text} {t.conformal.guarantee}</dd>
+            </div>
+          )}
         </dl>
       )}
       {t && t.out_of_distribution.length > 0 && (

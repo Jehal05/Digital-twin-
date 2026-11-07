@@ -1,6 +1,7 @@
 """Run the nested-CV comparison and write reports/<dataset>_comparison.{json,md}.
 
     python -m src.experiments heart            # combined 920-patient UCI data (+ leave-one-hospital-out checks)
+    python -m src.experiments pima             # Pima diabetes (768 women), same nested design as heart
     python -m src.experiments survey           # BRFSS 2015 survey model (253k respondents)
     add --quick for a fast smoke run (not for reporting)
 """
@@ -18,7 +19,7 @@ from sklearn.model_selection import RepeatedStratifiedKFold, StratifiedKFold
 
 from . import advanced as A
 from . import config as C
-from .data import BRFSS_FEATURES, load_brfss, load_cleveland, load_uci_heart_combined
+from .data import BRFSS_FEATURES, load_brfss, load_cleveland, load_pima, load_uci_heart_combined
 
 REPORTS = C.ROOT / "reports"
 HEART_FEATURES = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak"]
@@ -102,6 +103,31 @@ def run_heart(quick: bool) -> dict:
             "leave_one_hospital_out": loso, "cleveland_only_vs_combined": old}
 
 
+def run_pima(quick: bool) -> dict:
+    X, y, info = load_pima(C.RAW_DIR / "pima.csv")
+    feats = [f.name for f in C.DIABETES.features]
+    algos = A.ALGOS
+    rskf = RepeatedStratifiedKFold(n_splits=5, n_repeats=1 if quick else 2, random_state=A.SEED)
+    folds, oof, ys, ages, idxs = [], {a: [] for a in algos}, [], [], []
+    for i, (tr, te) in enumerate(rskf.split(X, y)):
+        res, probs = A.run_split(X, y, tr, te, f"fold {i + 1}", feats, frozenset(), algos, quick, small=True)
+        folds.append(res)
+        for a in algos:
+            oof[a].append(probs[a])
+        ys.append(y.iloc[te].to_numpy()); ages.append(X.iloc[te]["age"].to_numpy()); idxs.append(te)
+        print(f"pima nested fold {i + 1}: " + ", ".join(f"{a} {res.scores[a]['roc_auc']:.3f}" for a in algos), flush=True)
+    summary = A.summarise(folds, algos)
+    primary, reason = A.choose_primary(summary)
+    yy, aa = np.concatenate(ys), np.concatenate(ages)
+    pp = {a: np.concatenate(oof[a]) for a in algos}
+    grp = {"age under 30": aa < 30, "age 30-44": (aa >= 30) & (aa < 45), "age 45+": aa >= 45}
+    save_oof("pima" + ("_quick" if quick else ""), yy, pp, np.concatenate(idxs))
+    return {"dataset": "pima", "data": info, "features": feats, "algorithms": list(algos),
+            "nested_cv": {"outer": f"{rskf.get_n_splits()} folds (5-fold x {rskf.n_repeats})", "inner": "3-fold grid search",
+                          "summary": summary, "per_fold": [vars(f) for f in folds]},
+            "chosen_primary": primary, "choice_reason": reason, "pooled_out_of_fold": pooled(yy, pp, algos, grp)}
+
+
 def run_survey(quick: bool) -> dict:
     X, y, info = load_brfss(C.RAW_DIR / "brfss" / "diabetes_012_health_indicators_BRFSS2015.csv")
     if quick:
@@ -162,11 +188,11 @@ def markdown(rep: dict) -> str:
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("dataset", choices=["heart", "survey"])
+    ap.add_argument("dataset", choices=["heart", "survey", "pima"])
     ap.add_argument("--quick", action="store_true")
     a = ap.parse_args(argv)
     t0 = time.time()
-    rep = run_heart(a.quick) if a.dataset == "heart" else run_survey(a.quick)
+    rep = {"heart": run_heart, "survey": run_survey, "pima": run_pima}[a.dataset](a.quick)
     rep["run"] = {"quick": a.quick, "minutes": round((time.time() - t0) / 60, 1), "seed": A.SEED}
     REPORTS.mkdir(exist_ok=True)
     stem = f"{a.dataset}_comparison" + ("_quick" if a.quick else "")

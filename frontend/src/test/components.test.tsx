@@ -22,6 +22,23 @@ describe("RiskGauge", () => {
   });
 });
 
+describe("RiskGauge conformal check", () => {
+  const withConformal = (verdict: "higher" | "undecided"): typeof prediction => ({ ...prediction, trust: { ...prediction.trust!,
+    uncertainty_range: { low: 0.28, high: 0.35, method: "venn_abers", note: "" },
+    conformal: { outcome_set: verdict === "higher" ? [1] : [0, 1], verdict, coverage: 0.9, text: "Test sentence.", guarantee: "Guarantee sentence." } } });
+  it("states the 90% reliability verdict and its guarantee, without hiding the experimental label", () => {
+    render(<RiskGauge p={withConformal("undecided")} />);
+    expect(screen.getByTestId("conformal")).toHaveTextContent(/90% reliability check/i);
+    expect(screen.getByTestId("conformal")).toHaveTextContent(/too close to call/i);
+    expect(screen.getByText(/Probability range/)).toBeInTheDocument();
+    expect(screen.getAllByText(/not a diagnosis/i).length).toBeGreaterThan(0);
+  });
+  it("says when the model points one way", () => {
+    render(<RiskGauge p={withConformal("higher")} />);
+    expect(screen.getByTestId("conformal")).toHaveTextContent(/points to higher/i);
+  });
+});
+
 describe("DiseaseCard", () => {
   it("says honestly when a model is not trained", () => {
     render(<DiseaseCard condition="heart_disease" prediction={null} available={false} active={false} onSelect={() => {}} onRun={() => {}} />);

@@ -1,0 +1,66 @@
+{
+  "version": "2.1.0",
+  "trained_at": "2026-11-07T10:05:30+00:00",
+  "seed": 42,
+  "dependencies": {
+    "python": "3.13.18",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "shap": "0.54.1"
+  },
+  "dataset": {
+    "file": "uci_heart/processed.{cleveland,hungarian,switzerland,va}.data",
+    "sha256": "8afa902a889d1df808b5efb4a32e99f3d9d5ad4be9f59c7945141d6b81c168bc",
+    "rows": 920,
+    "positives": 509,
+    "positive_rate": 0.5533,
+    "sites": {
+      "cleveland": {
+        "file": "processed.cleveland.data",
+        "sha256": "a74b7efa387bc9d108d7d0115d831fe9b414b29ae7124f331b622b4efa0427c8",
+        "rows": 303,
+        "positive_rate": 0.4587
+      },
+      "hungarian": {
+        "file": "processed.hungarian.data",
+        "sha256": "a1f25da0eb1cf58932442bdc8b29dac6c469f33990a7302ebf306796e7882c1c",
+        "rows": 294,
+        "positive_rate": 0.3605
+      },
+      "switzerland": {
+        "file": "processed.switzerland.data",
+        "sha256": "834a405ccf5b66ab4056bb77794adc8df0b7125186454c0a1d002d33c6c3b314",
+        "rows": 123,
+        "positive_rate": 0.935
+      },
+      "va": {
+        "file": "processed.va.data",
+        "sha256": "e7c93d8d0d2acdadfa4c5e8de768e2191e7f618b952e29623f1f0d5949ff6b8f",
+        "rows": 200,
+        "positive_rate": 0.745
+      }
+    },
+    "zero_cholesterol_treated_as_missing": 172,
+    "zero_resting_bp_treated_as_missing": 1,
+    "missing_values": {
+      "trestbps": 60,
+      "chol": 202,
+      "fbs": 90,
+      "restecg": 2,
+      "thalach": 55,
+      "exang": 55,
+      "oldpeak": 62,
+      "slope": 309,
+      "ca": 611,
+      "thal": 486
+    },
+    "zeros_treated_as_missing": {
+      "chol": 172,
+      "trestbps": 1
+    }
+  },
+  "intended_use": "Educational and research demonstration of how a simple model's estimate changes with its inputs. NOT a medical device. Not for diagnosis, screening, treatment decisions or any clinical use.",
+  "cv_folds": 5,
+  "fast_mode": false
+}

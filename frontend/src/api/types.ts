@@ -11,6 +11,7 @@ export interface Explanation {
 export interface Trust {
   model_agreement: { logistic_regression: number; random_forest: number; difference_pp: number; level: "high" | "medium" | "low" };
   uncertainty_range: { low: number; high: number; method: string; note: string };
+  conformal?: { outcome_set: number[]; verdict: "higher" | "lower" | "undecided" | "unusual"; coverage: number; text: string; guarantee: string };
   out_of_distribution: { feature: string; value: number; training_range: [number, number] }[];
 }
 export interface Prediction {
@@ -61,6 +62,11 @@ export interface EvalMetrics {
   /** Present on version-2 models, which are scored by nested cross-validation instead of one split. */
   evaluation_basis?: string;
   nested_cv?: Record<string, Record<"roc_auc" | "brier" | "log_loss" | "ece", { mean: number; std: number }> & { auc_gain_vs_logistic: { mean: number; std: number; folds_better: number; folds: number } }>;
+  uncertainty?: { method: string; alpha: number; conformal_thresholds: Record<string, number>;
+    coverage_random_half: { coverage: { mean: number; std: number }; coverage_if_outcome_present: { mean: number }; coverage_if_outcome_absent: { mean: number };
+      share_decided: { mean: number }; share_undecided: { mean: number }; repeats: number };
+    coverage_leave_one_hospital_out?: Record<string, { n: number; coverage: number; coverage_if_outcome_present: number; coverage_if_outcome_absent: number }>;
+    venn_abers_width: { mean_width: number; median_width: number } };
   nested_cv_design?: { outer: string; inner: string };
   subgroup_roc_auc?: Record<string, { n: number; positive_rate: number; roc_auc: number }>;
   external_validation?: { leave_one_hospital_out?: Record<string, { n: number; positive_rate: number; roc_auc: Record<string, number> }> | null };

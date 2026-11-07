@@ -30,14 +30,16 @@ from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import StratifiedKFold
 
 from . import advanced as A
+from . import conformal as K
 from . import config as C
-from .data import load_brfss, load_uci_heart_combined
+from .data import load_brfss, load_pima, load_uci_heart_combined
 from .experiments import HEART_CATEGORICAL, REPORTS
 from .pipeline import INTENDED_USE, cohort_stats, evaluate, probabilistic_metrics
 
 RUNS = {
     "heart": dict(cond=C.HEART_V2, categorical=HEART_CATEGORICAL, small=True, bootstrap=20, perm_rows=None),
     "survey": dict(cond=C.SURVEY, categorical=frozenset(), small=False, bootstrap=8, perm_rows=60000),
+    "pima": dict(cond=C.DIABETES, categorical=frozenset(), small=True, bootstrap=20, perm_rows=None),
 }
 
 
@@ -46,6 +48,9 @@ def _load(kind: str, raw_dir: Path):
         X, y, site, info = load_uci_heart_combined(raw_dir / "uci_heart")
         info["zeros_treated_as_missing"] = {"chol": info["zero_cholesterol_treated_as_missing"],
                                             "trestbps": info["zero_resting_bp_treated_as_missing"]}
+        return X, y, info
+    if kind == "pima":
+        X, y, info = load_pima(raw_dir / "pima.csv")
         return X, y, info
     X, y, info = load_brfss(raw_dir / "brfss" / "diabetes_012_health_indicators_BRFSS2015.csv")
     info["zeros_treated_as_missing"] = {}
@@ -121,13 +126,20 @@ def train_final(kind: str, version: str, raw_dir: Path = C.RAW_DIR, out_root: Pa
         pipes[a] = pipeline_with(a, modal_params(report, a), features, categorical)
         cal[a] = A.fit_calibrated(pipes[a], X, y, run["small"])
     rng = np.random.default_rng(A.SEED)
+    # Uncertainty: conformal sets + Venn-Abers ranges, both calibrated on the out-of-fold scores of the primary model.
+    # Repeated CV predicts every row more than once; calibrate on ONE prediction per person (the first repeat) so that
+    # no person appears twice (twice would make the coverage check optimistic and the ranges too narrow).
+    _, first = np.unique(oof["order"], return_index=True)
+    first = np.sort(first)
+    y_c, p_c = yy[first], oof[f"p_{primary}"][first]
+    conf = K.fit_conformal(y_c, p_c)
+    va = K.fit_venn_abers(y_c, p_c)
+    conf_eval = {"alpha": K.ALPHA, "calibration_rows": int(len(first)), "coverage_random_half": K.evaluate_coverage(y_c, p_c),
+                 "venn_abers_width": K.range_width_stats(y_c, p_c, va)}
+    if kind == "heart":
+        _, _, site, _ = load_uci_heart_combined(raw_dir / "uci_heart")
+        conf_eval["coverage_leave_one_hospital_out"] = K.coverage_under_shift(y_c, p_c, site.to_numpy()[oof["order"][first]])
     members = []
-    for _ in range(run["bootstrap"]):
-        b = rng.choice(len(X), len(X), replace=True)
-        members.append(A.fit_calibrated(pipes[primary], X.iloc[b].reset_index(drop=True), y.iloc[b].reset_index(drop=True), run["small"]))
-    sample = X.sample(min(2000, len(X)), random_state=A.SEED)
-    member_p = np.column_stack([m.predict_proba(sample)[:, 1] for m in members])
-    q = np.percentile(member_p, [5, 95], axis=1)
     lr_rf = np.abs(oof["p_logistic_regression"] - oof["p_random_forest"]) * 100
 
     importance = oof_permutation_importance(pipes[primary], X, y, features, run["perm_rows"])
@@ -140,7 +152,7 @@ def train_final(kind: str, version: str, raw_dir: Path = C.RAW_DIR, out_root: Pa
               "features": [vars(f) | {"categories": list(f.categories)} for f in cond.features]}
     stats = cohort_stats(X, cond.features)
     joblib.dump({"condition": cond.key, "version": version, "primary": primary, "features": features, "models": cal,
-                 "bootstrap": members, "background": background, "operating_threshold": op_thr[primary], "schema": schema,
+                 "bootstrap": members, "conformal": conf, "venn_abers": va, "background": background, "operating_threshold": op_thr[primary], "schema": schema,
                  "cohort_stats": stats}, out_dir / "model.joblib", compress=3)
 
     metrics = {
@@ -156,7 +168,9 @@ def train_final(kind: str, version: str, raw_dir: Path = C.RAW_DIR, out_root: Pa
         "subgroup_roc_auc": report["pooled_out_of_fold"][primary]["subgroup_roc_auc"],
         "external_validation": {"leave_one_hospital_out": report.get("leave_one_hospital_out"),
                                 "cleveland_only_vs_combined": report.get("cleveland_only_vs_combined")} if kind == "heart" else None,
-        "trust_meter_on_test": {"mean_bootstrap_range_width": round(float(np.mean(q[1] - q[0])), 4),
+        "uncertainty": {"method": "conformal prediction sets (90%) + Venn-Abers probability range", **conf_eval,
+                        "conformal_thresholds": conf["q"]},
+        "trust_meter_on_test": {"mean_bootstrap_range_width": conf_eval["venn_abers_width"]["mean_width"],
                                 "mean_lr_rf_disagreement_pp": round(float(lr_rf.mean()), 2),
                                 "share_disagreeing_over_10pp": round(float((lr_rf > 10).mean()), 4)},
         "data": info,
@@ -207,6 +221,19 @@ def model_card(cond: C.Condition, m: dict, manifest: dict, kind: str) -> str:
                "\n\nThe model transfers well between Cleveland and Hungary but clearly worse to Switzerland and the VA sample "
                "(different patients, different test practices and missing data). Expect a similar drop for anyone unlike these patients.\n")
     d = m["data"]
+    u = m["uncertainty"]; cv = u["coverage_random_half"]
+    unc = (f"**Conformal prediction set.** For a person like the training data, the set of plausible outcomes contains the true outcome at least "
+           f"{(1 - u['alpha']) * 100:.0f}% of the time, separately for people with and without the outcome (guarantee needs exchangeability, "
+           f"and is averaged over people). Measured by calibrating on half of the out-of-fold predictions and testing on the other half "
+           f"({cv['repeats']} repeats): coverage {cv['coverage']['mean'] * 100:.1f}% (sd {cv['coverage']['std'] * 100:.1f}), "
+           f"{cv['share_decided']['mean'] * 100:.0f}% of people get a single-outcome answer, {cv['share_undecided']['mean'] * 100:.0f}% are 'too close to call'.\n\n"
+           f"**Venn-Abers range.** Mean width {u['venn_abers_width']['mean_width'] * 100:.1f} percentage points (median {u['venn_abers_width']['median_width'] * 100:.1f}); "
+           f"the well-calibrated probability lies inside it. Wide ranges mean the data cannot pin the number down.")
+    if u.get("coverage_leave_one_hospital_out"):
+        unc += ("\n\n**The guarantee breaks under population shift.** Calibrating on three hospitals and testing on the fourth:\n\n"
+                "| Held-out hospital | Coverage | Outcome present | Outcome absent |\n|---|---|---|---|\n" +
+                "\n".join(f"| {h} | {r['coverage'] * 100:.1f}% | {r['coverage_if_outcome_present'] * 100:.1f}% | {r['coverage_if_outcome_absent'] * 100:.1f}% |"
+                          for h, r in u["coverage_leave_one_hospital_out"].items()))
     return f"""# Model card: {cond.title}, version {m['version']}
 
 > **Experimental model estimate, not a diagnosis.** {manifest['intended_use']}
@@ -250,8 +277,11 @@ Most influential inputs (permutation importance, AUC drop): {imp}. This describe
 {sub}
 Differences between subgroups mean the estimate is more reliable for some people than others.
 {ext}
+## Uncertainty (conformal prediction and Venn-Abers range)
+{unc}
+
 ## Trust Meter
-Mean bootstrap range width {m['trust_meter_on_test']['mean_bootstrap_range_width']:.3f}; mean logistic-vs-forest disagreement
+Mean Venn-Abers range width {m['trust_meter_on_test']['mean_bootstrap_range_width']:.3f}; mean logistic-vs-forest disagreement
 {m['trust_meter_on_test']['mean_lr_rf_disagreement_pp']:.1f} percentage points ({_pct(m['trust_meter_on_test']['share_disagreeing_over_10pp'])} of rows over 10 points).
 
 ## Limitations
@@ -259,7 +289,7 @@ Mean bootstrap range width {m['trust_meter_on_test']['mean_bootstrap_range_width
 - What-If changes show how the model's estimate moves, not that changing a habit changes real health outcomes.
 - Inputs must be measured the way the dataset measured them (see the feature descriptions).
 - Risk bands (low below 20%, moderate below 50%, otherwise high) are a display convention, not clinical categories.
-{"- Self-reported survey answers; the outcome is an existing diagnosis, so undiagnosed diabetes is counted as 'no diabetes'. Income, education and insurance were deliberately left out so the estimate cannot depend on them." if kind == "survey" else "- Cholesterol recorded as 0 (172 patients) and a few resting blood-pressure zeros were treated as missing and imputed inside each training part."}
+{"- Self-reported survey answers; the outcome is an existing diagnosis, so undiagnosed diabetes is counted as 'no diabetes'. Income, education and insurance were deliberately left out so the estimate cannot depend on them." if kind == "survey" else "- Glucose, blood pressure, BMI and insulin recorded as 0 were treated as missing and imputed inside each training part." if kind == "pima" else "- Cholesterol recorded as 0 (172 patients) and a few resting blood-pressure zeros were treated as missing and imputed inside each training part."}
 
 ## Reproducibility
 Trained {manifest['trained_at']} with scikit-learn {manifest['dependencies']['scikit-learn']}, numpy {manifest['dependencies']['numpy']},

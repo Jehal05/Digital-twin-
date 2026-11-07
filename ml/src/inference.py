@@ -13,6 +13,7 @@ import pandas as pd
 import shap
 
 from . import config as C
+from . import conformal as K
 
 
 class InputValidationError(ValueError):
@@ -80,8 +81,22 @@ class HealthTwinModel:
         probs = {a: float(m.predict_proba(X)[0, 1]) for a, m in self.b["models"].items()}
         diff = (max(probs.values()) - min(probs.values())) * 100          # widest gap between any two model families
         lr, rf = probs.get("logistic_regression", p), probs.get("random_forest", p)
-        boot = np.array([m.predict_proba(X)[0, 1] for m in self.b["bootstrap"]])
-        low, high = np.percentile(boot, [5, 95])
+        extra = {}
+        if self.b.get("conformal"):
+            conf = self.b["conformal"]
+            lo, hi = K.venn_abers(p, self.b["venn_abers"])
+            low, high = min(lo, p), max(hi, p)
+            rng = {"low": round(float(low), 4), "high": round(float(high), 4), "method": "venn_abers",
+                   "note": "Venn-Abers range: the well-calibrated probability for inputs like yours lies inside it. A wide range means the "
+                           "training data cannot pin the number down. It is not a confidence interval for your own true risk."}
+            extra["conformal"] = K.describe_set(K.prediction_set(p, conf), 1 - conf["alpha"]) | {
+                "guarantee": f"For people like the training data, the true outcome is inside this set at least {round((1 - conf['alpha']) * 100)}% of the time "
+                             "(averaged over people; does not hold for people unlike the training data)."}
+        else:
+            boot = np.array([m.predict_proba(X)[0, 1] for m in self.b["bootstrap"]])
+            low, high = np.percentile(boot, [5, 95])
+            rng = {"low": round(float(min(low, p)), 4), "high": round(float(max(high, p)), 4), "method": "bootstrap_ensemble",
+                   "note": "Spread of models refit on resampled training data; not a confidence interval for your true risk."}
         ood = []
         for name, st in self.b["cohort_stats"].items():
             if self.schema[name]["kind"] in ("continuous", "integer"):
@@ -93,9 +108,8 @@ class HealthTwinModel:
                                 "models": {a: round(v, 4) for a, v in probs.items()},
                                 "difference_pp": round(diff, 1),
                                 "level": "high" if diff < 5 else "medium" if diff < 10 else "low"},
-            "uncertainty_range": {"low": round(float(min(low, p)), 4), "high": round(float(max(high, p)), 4),
-                                  "method": "bootstrap_ensemble",
-                                  "note": "Spread of models refit on resampled training data; not a confidence interval for your true risk."},
+            "uncertainty_range": rng,
+            **extra,
             "out_of_distribution": ood,
         }
 

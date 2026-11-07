@@ -1,0 +1,973 @@
+{
+  "condition": "diabetes",
+  "version": "2.0.0",
+  "primary_algorithm": "logistic_regression",
+  "evaluation_basis": "nested_cross_validation",
+  "selection_rule": "Nested cross-validation across 4 algorithms; the simplest model within 0.01 ROC-AUC of the best is kept. random_forest scored highest (AUC 0.838) but only 0.007 above logistic_regression, within the 0.01 simplicity margin, so the simpler model is kept.",
+  "split": {
+    "scheme": "nested cross-validation: every row held out once",
+    "train_rows": 1536,
+    "test_rows": 1536,
+    "train_positive_rate": 0.349,
+    "test_positive_rate": 0.349
+  },
+  "models": {
+    "logistic_regression": {
+      "is_primary": true,
+      "best_params": {
+        "C": 0.1
+      },
+      "cv_roc_auc_train": 0.8311,
+      "cv_roc_auc_std": 0.0288,
+      "test": {
+        "roc_auc": 0.8286,
+        "brier_score": 0.1602,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.005,
+            0.014,
+            0.018,
+            0.022,
+            0.028,
+            0.033,
+            0.037,
+            0.044,
+            0.052,
+            0.057,
+            0.064,
+            0.068,
+            0.076,
+            0.085,
+            0.09,
+            0.1,
+            0.106,
+            0.115,
+            0.123,
+            0.129,
+            0.135,
+            0.144,
+            0.159,
+            0.177,
+            0.188,
+            0.2,
+            0.208,
+            0.217,
+            0.228,
+            0.235,
+            0.241,
+            0.252,
+            0.256,
+            0.265,
+            0.276,
+            0.284,
+            0.294,
+            0.305,
+            0.316,
+            0.33,
+            0.337,
+            0.354,
+            0.359,
+            0.371,
+            0.397,
+            0.405,
+            0.417,
+            0.43,
+            0.45,
+            0.462,
+            0.5,
+            0.522,
+            0.54,
+            0.572,
+            0.581,
+            0.618,
+            0.69,
+            0.767,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.069,
+            0.0896,
+            0.1437,
+            0.1716,
+            0.2313,
+            0.2668,
+            0.3078,
+            0.3321,
+            0.3675,
+            0.4011,
+            0.4179,
+            0.4422,
+            0.4515,
+            0.4664,
+            0.4944,
+            0.5112,
+            0.5224,
+            0.5299,
+            0.5466,
+            0.5578,
+            0.569,
+            0.5858,
+            0.6007,
+            0.6157,
+            0.6362,
+            0.6437,
+            0.6567,
+            0.6679,
+            0.6772,
+            0.6903,
+            0.7015,
+            0.7108,
+            0.7276,
+            0.7407,
+            0.75,
+            0.7593,
+            0.7687,
+            0.7817,
+            0.7985,
+            0.8172,
+            0.8246,
+            0.8377,
+            0.8507,
+            0.8601,
+            0.8694,
+            0.8825,
+            0.8918,
+            0.8993,
+            0.9086,
+            0.9179,
+            0.9272,
+            0.9384,
+            0.9478,
+            0.9552,
+            0.9683,
+            0.9757,
+            0.9832,
+            0.9925,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0615,
+            0.15,
+            0.2691,
+            0.4798,
+            0.7934
+          ],
+          "fraction_positive": [
+            0.026,
+            0.1433,
+            0.355,
+            0.4463,
+            0.7752
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.036,
+          "max_abs": 0.0859
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.7611,
+          "sensitivity": 0.5616,
+          "specificity": 0.868,
+          "precision": 0.6952,
+          "confusion_matrix": {
+            "tn": 868,
+            "fp": 132,
+            "fn": 235,
+            "tp": 301
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.2355,
+          "accuracy": 0.7135,
+          "sensitivity": 0.8582,
+          "specificity": 0.636,
+          "precision": 0.5583,
+          "confusion_matrix": {
+            "tn": 636,
+            "fp": 364,
+            "fn": 76,
+            "tp": 460
+          }
+        }
+      }
+    },
+    "random_forest": {
+      "is_primary": false,
+      "best_params": {
+        "max_depth": 4,
+        "min_samples_leaf": 3
+      },
+      "cv_roc_auc_train": 0.8382,
+      "cv_roc_auc_std": 0.0351,
+      "test": {
+        "roc_auc": 0.8326,
+        "brier_score": 0.1568,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.004,
+            0.009,
+            0.015,
+            0.022,
+            0.027,
+            0.031,
+            0.035,
+            0.039,
+            0.046,
+            0.053,
+            0.057,
+            0.063,
+            0.068,
+            0.073,
+            0.08,
+            0.09,
+            0.098,
+            0.103,
+            0.108,
+            0.117,
+            0.121,
+            0.128,
+            0.136,
+            0.141,
+            0.156,
+            0.164,
+            0.168,
+            0.181,
+            0.186,
+            0.199,
+            0.211,
+            0.217,
+            0.225,
+            0.232,
+            0.239,
+            0.251,
+            0.265,
+            0.275,
+            0.29,
+            0.295,
+            0.303,
+            0.319,
+            0.332,
+            0.356,
+            0.374,
+            0.399,
+            0.433,
+            0.463,
+            0.483,
+            0.514,
+            0.534,
+            0.57,
+            0.591,
+            0.623,
+            0.66,
+            0.683,
+            0.713,
+            0.75,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0354,
+            0.056,
+            0.1175,
+            0.1493,
+            0.1903,
+            0.2351,
+            0.278,
+            0.3041,
+            0.3433,
+            0.3563,
+            0.3713,
+            0.403,
+            0.4198,
+            0.4422,
+            0.4515,
+            0.4664,
+            0.4795,
+            0.4981,
+            0.5131,
+            0.5299,
+            0.5466,
+            0.5765,
+            0.5914,
+            0.6157,
+            0.6269,
+            0.6418,
+            0.6511,
+            0.6735,
+            0.6978,
+            0.7127,
+            0.7276,
+            0.7351,
+            0.7463,
+            0.7575,
+            0.7649,
+            0.7817,
+            0.791,
+            0.8004,
+            0.8097,
+            0.8209,
+            0.8302,
+            0.8377,
+            0.847,
+            0.8582,
+            0.8713,
+            0.8843,
+            0.8918,
+            0.8993,
+            0.9067,
+            0.916,
+            0.9254,
+            0.9328,
+            0.944,
+            0.9534,
+            0.9627,
+            0.9757,
+            0.9851,
+            0.9925,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0774,
+            0.1329,
+            0.2583,
+            0.4983,
+            0.7786
+          ],
+          "fraction_positive": [
+            0.0357,
+            0.1531,
+            0.2671,
+            0.5244,
+            0.7655
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.022,
+          "max_abs": 0.0417
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.7695,
+          "sensitivity": 0.5896,
+          "specificity": 0.866,
+          "precision": 0.7022,
+          "confusion_matrix": {
+            "tn": 866,
+            "fp": 134,
+            "fn": 220,
+            "tp": 316
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.3339,
+          "accuracy": 0.763,
+          "sensitivity": 0.7761,
+          "specificity": 0.756,
+          "precision": 0.6303,
+          "confusion_matrix": {
+            "tn": 756,
+            "fp": 244,
+            "fn": 120,
+            "tp": 416
+          }
+        }
+      }
+    },
+    "hist_gradient_boosting": {
+      "is_primary": false,
+      "best_params": {
+        "l2_regularization": 0.0,
+        "learning_rate": 0.03,
+        "max_depth": 2
+      },
+      "cv_roc_auc_train": 0.8371,
+      "cv_roc_auc_std": 0.0276,
+      "test": {
+        "roc_auc": 0.8336,
+        "brier_score": 0.1565,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.004,
+            0.009,
+            0.014,
+            0.021,
+            0.028,
+            0.033,
+            0.04,
+            0.046,
+            0.052,
+            0.057,
+            0.064,
+            0.069,
+            0.077,
+            0.085,
+            0.093,
+            0.105,
+            0.116,
+            0.13,
+            0.138,
+            0.147,
+            0.154,
+            0.16,
+            0.17,
+            0.178,
+            0.191,
+            0.198,
+            0.205,
+            0.213,
+            0.218,
+            0.228,
+            0.24,
+            0.249,
+            0.269,
+            0.279,
+            0.291,
+            0.306,
+            0.321,
+            0.331,
+            0.341,
+            0.369,
+            0.394,
+            0.41,
+            0.434,
+            0.451,
+            0.478,
+            0.505,
+            0.532,
+            0.543,
+            0.584,
+            0.601,
+            0.655,
+            0.684,
+            0.716,
+            0.745,
+            0.782,
+            0.835,
+            0.869,
+            0.957,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0205,
+            0.0466,
+            0.1026,
+            0.1754,
+            0.2164,
+            0.2407,
+            0.278,
+            0.2948,
+            0.334,
+            0.3582,
+            0.3937,
+            0.416,
+            0.431,
+            0.4515,
+            0.4925,
+            0.5224,
+            0.5429,
+            0.556,
+            0.5784,
+            0.5989,
+            0.6138,
+            0.6306,
+            0.6493,
+            0.6604,
+            0.6754,
+            0.694,
+            0.7127,
+            0.7201,
+            0.7388,
+            0.7519,
+            0.7668,
+            0.778,
+            0.7873,
+            0.8041,
+            0.8172,
+            0.8265,
+            0.8358,
+            0.847,
+            0.8619,
+            0.875,
+            0.8825,
+            0.8955,
+            0.9011,
+            0.9104,
+            0.9179,
+            0.931,
+            0.9366,
+            0.9478,
+            0.9534,
+            0.9646,
+            0.9701,
+            0.972,
+            0.9776,
+            0.9813,
+            0.9869,
+            0.9907,
+            0.9963,
+            0.9963,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0359,
+            0.1455,
+            0.3096,
+            0.5157,
+            0.7745
+          ],
+          "fraction_positive": [
+            0.0422,
+            0.127,
+            0.2866,
+            0.5375,
+            0.7524
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.0183,
+          "max_abs": 0.023
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.7656,
+          "sensitivity": 0.6138,
+          "specificity": 0.847,
+          "precision": 0.6826,
+          "confusion_matrix": {
+            "tn": 847,
+            "fp": 153,
+            "fn": 207,
+            "tp": 329
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.3825,
+          "accuracy": 0.7643,
+          "sensitivity": 0.7724,
+          "specificity": 0.76,
+          "precision": 0.633,
+          "confusion_matrix": {
+            "tn": 760,
+            "fp": 240,
+            "fn": 122,
+            "tp": 414
+          }
+        }
+      }
+    },
+    "neural_network": {
+      "is_primary": false,
+      "best_params": {
+        "alpha": 0.0001
+      },
+      "cv_roc_auc_train": 0.8043,
+      "cv_roc_auc_std": 0.0362,
+      "test": {
+        "roc_auc": 0.7828,
+        "brier_score": 0.1766,
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.004,
+            0.008,
+            0.016,
+            0.022,
+            0.029,
+            0.035,
+            0.04,
+            0.046,
+            0.052,
+            0.061,
+            0.066,
+            0.072,
+            0.077,
+            0.084,
+            0.092,
+            0.104,
+            0.112,
+            0.122,
+            0.133,
+            0.144,
+            0.157,
+            0.169,
+            0.175,
+            0.186,
+            0.196,
+            0.207,
+            0.212,
+            0.224,
+            0.238,
+            0.252,
+            0.27,
+            0.276,
+            0.287,
+            0.31,
+            0.331,
+            0.343,
+            0.358,
+            0.376,
+            0.391,
+            0.412,
+            0.449,
+            0.462,
+            0.484,
+            0.496,
+            0.516,
+            0.532,
+            0.551,
+            0.57,
+            0.602,
+            0.63,
+            0.657,
+            0.686,
+            0.715,
+            0.732,
+            0.79,
+            0.817,
+            0.896,
+            0.926,
+            1.0
+          ],
+          "tpr": [
+            0.0,
+            0.0299,
+            0.0765,
+            0.1026,
+            0.1175,
+            0.1586,
+            0.1978,
+            0.2257,
+            0.2463,
+            0.2612,
+            0.3265,
+            0.3396,
+            0.375,
+            0.3918,
+            0.4216,
+            0.4515,
+            0.4757,
+            0.4907,
+            0.4981,
+            0.5149,
+            0.541,
+            0.5672,
+            0.5746,
+            0.5896,
+            0.6175,
+            0.6325,
+            0.6437,
+            0.6567,
+            0.6754,
+            0.6922,
+            0.7052,
+            0.7164,
+            0.7257,
+            0.7332,
+            0.7425,
+            0.7575,
+            0.7649,
+            0.7761,
+            0.7873,
+            0.8004,
+            0.8097,
+            0.819,
+            0.8321,
+            0.8396,
+            0.8507,
+            0.8619,
+            0.8713,
+            0.8787,
+            0.8918,
+            0.9011,
+            0.9142,
+            0.9216,
+            0.931,
+            0.9422,
+            0.9515,
+            0.9627,
+            0.972,
+            0.9813,
+            0.9888,
+            1.0
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0963,
+            0.2217,
+            0.3246,
+            0.4809,
+            0.7433
+          ],
+          "fraction_positive": [
+            0.0877,
+            0.1987,
+            0.2443,
+            0.4886,
+            0.7264
+          ]
+        },
+        "calibration_gap": {
+          "mean_abs": 0.0273,
+          "max_abs": 0.0803
+        },
+        "at_0.5": {
+          "threshold": 0.5,
+          "accuracy": 0.7467,
+          "sensitivity": 0.5392,
+          "specificity": 0.858,
+          "precision": 0.6705,
+          "confusion_matrix": {
+            "tn": 858,
+            "fp": 142,
+            "fn": 247,
+            "tp": 289
+          }
+        },
+        "at_operating_threshold": {
+          "threshold": 0.3896,
+          "accuracy": 0.7389,
+          "sensitivity": 0.7015,
+          "specificity": 0.759,
+          "precision": 0.6094,
+          "confusion_matrix": {
+            "tn": 759,
+            "fp": 241,
+            "fn": 160,
+            "tp": 376
+          }
+        }
+      }
+    }
+  },
+  "operating_threshold": 0.2355,
+  "operating_thresholds": {
+    "logistic_regression": 0.2355,
+    "random_forest": 0.3339,
+    "hist_gradient_boosting": 0.3825,
+    "neural_network": 0.3896
+  },
+  "permutation_importance": [
+    {
+      "feature": "glucose",
+      "mean_auc_drop": 0.1963,
+      "std": 0.0503
+    },
+    {
+      "feature": "bmi",
+      "mean_auc_drop": 0.0616,
+      "std": 0.0211
+    },
+    {
+      "feature": "pregnancies",
+      "mean_auc_drop": 0.0289,
+      "std": 0.0128
+    },
+    {
+      "feature": "age",
+      "mean_auc_drop": 0.006,
+      "std": 0.0064
+    },
+    {
+      "feature": "blood_pressure",
+      "mean_auc_drop": 0.0012,
+      "std": 0.004
+    }
+  ],
+  "feature_set_sensitivity": {},
+  "nested_cv": {
+    "logistic_regression": {
+      "roc_auc": {
+        "mean": 0.8311,
+        "std": 0.0288
+      },
+      "brier": {
+        "mean": 0.1602,
+        "std": 0.015
+      },
+      "log_loss": {
+        "mean": 0.4821,
+        "std": 0.0348
+      },
+      "ece": {
+        "mean": 0.0776,
+        "std": 0.0217
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.0,
+        "std": 0.0,
+        "folds_better": 0,
+        "folds": 10
+      }
+    },
+    "random_forest": {
+      "roc_auc": {
+        "mean": 0.8382,
+        "std": 0.0351
+      },
+      "brier": {
+        "mean": 0.1568,
+        "std": 0.015
+      },
+      "log_loss": {
+        "mean": 0.4792,
+        "std": 0.037
+      },
+      "ece": {
+        "mean": 0.0861,
+        "std": 0.0093
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.0071,
+        "std": 0.0175,
+        "folds_better": 7,
+        "folds": 10
+      }
+    },
+    "hist_gradient_boosting": {
+      "roc_auc": {
+        "mean": 0.8371,
+        "std": 0.0276
+      },
+      "brier": {
+        "mean": 0.1565,
+        "std": 0.0141
+      },
+      "log_loss": {
+        "mean": 0.4766,
+        "std": 0.0335
+      },
+      "ece": {
+        "mean": 0.0722,
+        "std": 0.0163
+      },
+      "auc_gain_vs_logistic": {
+        "mean": 0.006,
+        "std": 0.0165,
+        "folds_better": 6,
+        "folds": 10
+      }
+    },
+    "neural_network": {
+      "roc_auc": {
+        "mean": 0.8043,
+        "std": 0.0362
+      },
+      "brier": {
+        "mean": 0.1766,
+        "std": 0.016
+      },
+      "log_loss": {
+        "mean": 0.5344,
+        "std": 0.0461
+      },
+      "ece": {
+        "mean": 0.1146,
+        "std": 0.0301
+      },
+      "auc_gain_vs_logistic": {
+        "mean": -0.0268,
+        "std": 0.0381,
+        "folds_better": 3,
+        "folds": 10
+      }
+    }
+  },
+  "nested_cv_design": {
+    "outer": "10 folds (5-fold x 2)",
+    "inner": "3-fold grid search"
+  },
+  "subgroup_roc_auc": {
+    "age under 30": {
+      "n": 792,
+      "positive_rate": 0.2121,
+      "roc_auc": 0.8465
+    },
+    "age 30-44": {
+      "n": 478,
+      "positive_rate": 0.4937,
+      "roc_auc": 0.7854
+    },
+    "age 45+": {
+      "n": 266,
+      "positive_rate": 0.4962,
+      "roc_auc": 0.7212
+    }
+  },
+  "external_validation": null,
+  "uncertainty": {
+    "method": "conformal prediction sets (90%) + Venn-Abers probability range",
+    "alpha": 0.1,
+    "calibration_rows": 768,
+    "coverage_random_half": {
+      "coverage": {
+        "mean": 0.9031,
+        "std": 0.0219
+      },
+      "coverage_if_outcome_present": {
+        "mean": 0.904,
+        "std": 0.0362
+      },
+      "coverage_if_outcome_absent": {
+        "mean": 0.9025,
+        "std": 0.0252
+      },
+      "share_decided": {
+        "mean": 0.6364,
+        "std": 0.049
+      },
+      "share_undecided": {
+        "mean": 0.3636,
+        "std": 0.049
+      },
+      "share_empty": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "target_coverage": 0.9,
+      "repeats": 200,
+      "design": "calibrate on a random half of the out-of-fold predictions, test on the other half"
+    },
+    "venn_abers_width": {
+      "mean_width": 0.0271,
+      "median_width": 0.0129,
+      "rows": 400
+    },
+    "conformal_thresholds": {
+      "0": 0.5785017311381437,
+      "1": 0.7906020052604836
+    }
+  },
+  "trust_meter_on_test": {
+    "mean_bootstrap_range_width": 0.0271,
+    "mean_lr_rf_disagreement_pp": 7.29,
+    "share_disagreeing_over_10pp": 0.2611
+  },
+  "data": {
+    "file": "pima.csv",
+    "sha256": "6bfe5d0f379d17a0e0819b996407e3c09bf80febd4287f2ed212190dfff154af",
+    "rows": 768,
+    "positives": 268,
+    "positive_rate": 0.349,
+    "zeros_treated_as_missing": {
+      "glucose": 5,
+      "blood_pressure": 35,
+      "skin_thickness": 227,
+      "insulin": 374,
+      "bmi": 11
+    },
+    "duplicate_rows": 0
+  }
+}
