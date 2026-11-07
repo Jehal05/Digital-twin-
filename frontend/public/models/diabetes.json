@@ -1,0 +1,111 @@
+{
+ "condition": "diabetes",
+ "version": "2.0.0",
+ "algorithm": "logistic_regression",
+ "intercept": -0.8285420737945702,
+ "calibration": {
+  "a": -1.0706687402495323,
+  "b": -0.033062127943881144
+ },
+ "terms": [
+  {
+   "feature": "pregnancies",
+   "kind": "numeric",
+   "median": 3.0,
+   "mean": 3.8450520833333335,
+   "scale": 3.3673836124089958,
+   "coef": 0.3520422417714786
+  },
+  {
+   "feature": "glucose",
+   "kind": "numeric",
+   "median": 117.0,
+   "mean": 121.65625,
+   "scale": 30.418462775166116,
+   "coef": 1.0027118013804746
+  },
+  {
+   "feature": "blood_pressure",
+   "kind": "numeric",
+   "median": 72.0,
+   "mean": 72.38671875,
+   "scale": 12.088763750899638,
+   "coef": -0.0730040692918369
+  },
+  {
+   "feature": "bmi",
+   "kind": "numeric",
+   "median": 32.3,
+   "mean": 32.45520833333333,
+   "scale": 6.870699333517456,
+   "coef": 0.6025127996243108
+  },
+  {
+   "feature": "age",
+   "kind": "numeric",
+   "median": 29.0,
+   "mean": 33.240885416666664,
+   "scale": 11.752572645994181,
+   "coef": 0.17253136703807714
+  }
+ ],
+ "features": [
+  "pregnancies",
+  "glucose",
+  "blood_pressure",
+  "bmi",
+  "age"
+ ],
+ "risk_band_edges": [
+  0.2,
+  0.5
+ ],
+ "schema": {
+  "pregnancies": {
+   "label": "Pregnancies",
+   "unit": "count",
+   "kind": "integer",
+   "min": 0,
+   "max": 20,
+   "categories": [],
+   "editable": false
+  },
+  "glucose": {
+   "label": "2-hour plasma glucose (oral glucose tolerance test)",
+   "unit": "mg/dL",
+   "kind": "continuous",
+   "min": 40,
+   "max": 400,
+   "categories": [],
+   "editable": true
+  },
+  "blood_pressure": {
+   "label": "Diastolic blood pressure",
+   "unit": "mmHg",
+   "kind": "continuous",
+   "min": 30,
+   "max": 130,
+   "categories": [],
+   "editable": true
+  },
+  "bmi": {
+   "label": "Body mass index",
+   "unit": "kg/m2",
+   "kind": "continuous",
+   "min": 12,
+   "max": 70,
+   "categories": [],
+   "editable": true
+  },
+  "age": {
+   "label": "Age",
+   "unit": "years",
+   "kind": "integer",
+   "min": 18,
+   "max": 100,
+   "categories": [],
+   "editable": false
+  }
+ },
+ "note": "Experimental model estimate, not a diagnosis. Computed entirely on this device."
+}

@@ -1,0 +1,309 @@
+{
+ "condition": "diabetes_survey",
+ "version": "1.1.0",
+ "algorithm": "logistic_regression",
+ "intercept": -2.411896112488945,
+ "calibration": {
+  "a": -0.987766921934746,
+  "b": 0.01514827300308315
+ },
+ "terms": [
+  {
+   "feature": "high_bp",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.42904555828774094,
+   "scale": 0.49493986220681563,
+   "coef": 0.3696410001711754
+  },
+  {
+   "feature": "high_chol",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.4247551491881691,
+   "scale": 0.49430578838033573,
+   "coef": 0.28533585563672825
+  },
+  {
+   "feature": "bmi",
+   "kind": "numeric",
+   "median": 27.0,
+   "mean": 28.26728830340583,
+   "scale": 6.125557192276407,
+   "coef": 0.46107873123521453
+  },
+  {
+   "feature": "smoker",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.44246064026105025,
+   "scale": 0.49667818764349997,
+   "coef": 0.006433093849773272
+  },
+  {
+   "feature": "stroke",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.0404962557697403,
+   "scale": 0.1971200371306075,
+   "coef": 0.034697957552426606
+  },
+  {
+   "feature": "heart_disease_or_attack",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.09398924376310248,
+   "scale": 0.2918137519376744,
+   "coef": 0.07140993079535167
+  },
+  {
+   "feature": "physical_activity",
+   "kind": "numeric",
+   "median": 1.0,
+   "mean": 0.7569852787371416,
+   "scale": 0.428903912913363,
+   "coef": -0.01985337623513822
+  },
+  {
+   "feature": "fruit_daily",
+   "kind": "numeric",
+   "median": 1.0,
+   "mean": 0.6345714936480563,
+   "scale": 0.48155011483471905,
+   "coef": -0.023998736074952665
+  },
+  {
+   "feature": "veg_daily",
+   "kind": "numeric",
+   "median": 1.0,
+   "mean": 0.8115938660630034,
+   "scale": 0.3910361398028461,
+   "coef": -0.028761079857732234
+  },
+  {
+   "feature": "heavy_alcohol",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.055919416541549104,
+   "scale": 0.22976604491352026,
+   "coef": -0.18104722457811295
+  },
+  {
+   "feature": "general_health",
+   "kind": "numeric",
+   "median": 2.0,
+   "mean": 2.5110607025486797,
+   "scale": 1.067649248744223,
+   "coef": 0.5914045077167622
+  },
+  {
+   "feature": "mental_health_days",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 3.181628867992061,
+   "scale": 7.412782382471743,
+   "coef": -0.022677651565030328
+  },
+  {
+   "feature": "physical_health_days",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 4.238101435869307,
+   "scale": 8.71299529213334,
+   "coef": -0.06373884639224134
+  },
+  {
+   "feature": "difficulty_walking",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.16793023785507435,
+   "scale": 0.37380432457237905,
+   "coef": 0.052499754611454556
+  },
+  {
+   "feature": "sex",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.4402945182237799,
+   "scale": 0.49642245662930023,
+   "coef": 0.10443703402875232
+  },
+  {
+   "feature": "age_band",
+   "kind": "numeric",
+   "median": 8.0,
+   "mean": 8.037604994166346,
+   "scale": 3.0518874368736957,
+   "coef": 0.4204286432870359
+  }
+ ],
+ "features": [
+  "high_bp",
+  "high_chol",
+  "bmi",
+  "smoker",
+  "stroke",
+  "heart_disease_or_attack",
+  "physical_activity",
+  "fruit_daily",
+  "veg_daily",
+  "heavy_alcohol",
+  "general_health",
+  "mental_health_days",
+  "physical_health_days",
+  "difficulty_walking",
+  "sex",
+  "age_band"
+ ],
+ "risk_band_edges": [
+  0.2,
+  0.5
+ ],
+ "schema": {
+  "high_bp": {
+   "label": "Told you have high blood pressure (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "high_chol": {
+   "label": "Told you have high cholesterol (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "bmi": {
+   "label": "Body mass index",
+   "unit": "kg/m2",
+   "kind": "continuous",
+   "min": 12,
+   "max": 70,
+   "categories": [],
+   "editable": true
+  },
+  "smoker": {
+   "label": "Smoked at least 100 cigarettes in your life (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": true
+  },
+  "stroke": {
+   "label": "Ever told you had a stroke (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "heart_disease_or_attack": {
+   "label": "Ever told you had coronary heart disease or a heart attack (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "physical_activity": {
+   "label": "Any physical activity in the past 30 days outside work (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": true
+  },
+  "fruit_daily": {
+   "label": "Eat fruit at least once a day (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": true
+  },
+  "veg_daily": {
+   "label": "Eat vegetables at least once a day (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": true
+  },
+  "heavy_alcohol": {
+   "label": "Heavy drinker (men over 14, women over 7 drinks a week) (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": true
+  },
+  "general_health": {
+   "label": "General health (1 excellent, 2 very good, 3 good, 4 fair, 5 poor)",
+   "unit": "",
+   "kind": "integer",
+   "min": 1,
+   "max": 5,
+   "categories": [],
+   "editable": false
+  },
+  "mental_health_days": {
+   "label": "Days of poor mental health in the past 30",
+   "unit": "days",
+   "kind": "integer",
+   "min": 0,
+   "max": 30,
+   "categories": [],
+   "editable": false
+  },
+  "physical_health_days": {
+   "label": "Days of poor physical health in the past 30",
+   "unit": "days",
+   "kind": "integer",
+   "min": 0,
+   "max": 30,
+   "categories": [],
+   "editable": false
+  },
+  "difficulty_walking": {
+   "label": "Serious difficulty walking or climbing stairs (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "sex": {
+   "label": "Sex (1 = male, 0 = female)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "age_band": {
+   "label": "Age group (1 = 18-24, 2 = 25-29, ... 12 = 75-79, 13 = 80 or older)",
+   "unit": "",
+   "kind": "integer",
+   "min": 1,
+   "max": 13,
+   "categories": [],
+   "editable": false
+  }
+ },
+ "note": "Experimental model estimate, not a diagnosis. Computed entirely on this device."
+}

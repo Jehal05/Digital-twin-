@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { OnDevicePage } from "./pages/OnDevicePage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import { DashboardProvider } from "./auth/DataContext";
@@ -47,6 +48,7 @@ export default function App() {
     <PrefsProvider><BrowserRouter>
       <Routes>
         <Route path="/shared/:token" element={<SharedPage />} />
+        <Route path="/on-device" element={<OnDevicePage />} />
         <Route path="*" element={<AuthProvider><Gate /></AuthProvider>} />
       </Routes>
     </BrowserRouter></PrefsProvider>

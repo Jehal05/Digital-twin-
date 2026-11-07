@@ -1,6 +1,6 @@
-/* HealthTwin service worker: caches the app shell only. It never touches /api/ (health data) or any non-GET request. */
-const CACHE = "healthtwin-shell-v1";
-const SHELL = ["/", "/favicon.svg", "/icon-192.png", "/manifest.webmanifest"];
+/* HealthTwin service worker: caches the app shell and the public model files only. It never touches /api/ (health data) or any non-GET request. */
+const CACHE = "healthtwin-shell-v2";
+const SHELL = ["/", "/favicon.svg", "/icon-192.png", "/manifest.webmanifest", "/models/diabetes.json", "/models/heart_disease.json", "/models/diabetes_survey.json"];
 
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => {
@@ -14,7 +14,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   e.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((r) => {   // static assets: cache first
-    if (r.ok && url.pathname.startsWith("/assets/")) caches.open(CACHE).then((c) => c.put(req, r.clone()));
+    if (r.ok && (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/models/"))) caches.open(CACHE).then((c) => c.put(req, r.clone()));
     return r;
   })));
 });

@@ -1,0 +1,226 @@
+{
+ "condition": "heart_disease",
+ "version": "2.1.0",
+ "algorithm": "logistic_regression",
+ "intercept": 0.009327892658238555,
+ "calibration": {
+  "a": -0.9401278942405876,
+  "b": -0.0145581823626094
+ },
+ "terms": [
+  {
+   "feature": "age",
+   "kind": "numeric",
+   "median": 54.0,
+   "mean": 53.51086956521739,
+   "scale": 9.419561705414813,
+   "coef": 0.273853462085755
+  },
+  {
+   "feature": "sex",
+   "kind": "numeric",
+   "median": 1.0,
+   "mean": 0.7891304347826087,
+   "scale": 0.4079259634816343,
+   "coef": 0.562864176278032
+  },
+  {
+   "feature": "trestbps",
+   "kind": "numeric",
+   "median": 130.0,
+   "mean": 132.13695652173914,
+   "scale": 17.920013813752103,
+   "coef": 0.0198328666208574
+  },
+  {
+   "feature": "chol",
+   "kind": "numeric",
+   "median": 239.5,
+   "mean": 245.22282608695653,
+   "scale": 51.757175732832636,
+   "coef": 0.19976579108888956
+  },
+  {
+   "feature": "fbs",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.15,
+   "scale": 0.3570714214271425,
+   "coef": 0.1330590398287918
+  },
+  {
+   "feature": "thalach",
+   "kind": "numeric",
+   "median": 140.0,
+   "mean": 137.69239130434784,
+   "scale": 25.1315656949913,
+   "coef": -0.3985833988034496
+  },
+  {
+   "feature": "exang",
+   "kind": "numeric",
+   "median": 0.0,
+   "mean": 0.36630434782608695,
+   "scale": 0.48179401468863436,
+   "coef": 0.4472067684786284
+  },
+  {
+   "feature": "oldpeak",
+   "kind": "numeric",
+   "median": 0.5,
+   "mean": 0.8532608695652174,
+   "scale": 1.0574735156470332,
+   "coef": 0.5171855223220123
+  },
+  {
+   "feature": "cp",
+   "kind": "categorical",
+   "mode": 4.0,
+   "categories": [
+    1.0,
+    2.0,
+    3.0,
+    4.0
+   ],
+   "coefs": [
+    -0.018904171263786528,
+    -0.7544475025458035,
+    -0.21329819426276597,
+    0.9746893580841453
+   ]
+  },
+  {
+   "feature": "restecg",
+   "kind": "categorical",
+   "mode": 0.0,
+   "categories": [
+    0.0,
+    1.0,
+    2.0
+   ],
+   "coefs": [
+    -0.036670960327377246,
+    0.09726867048583038,
+    -0.07255822014666279
+   ]
+  }
+ ],
+ "features": [
+  "age",
+  "sex",
+  "cp",
+  "trestbps",
+  "chol",
+  "fbs",
+  "restecg",
+  "thalach",
+  "exang",
+  "oldpeak"
+ ],
+ "risk_band_edges": [
+  0.2,
+  0.5
+ ],
+ "schema": {
+  "age": {
+   "label": "Age",
+   "unit": "years",
+   "kind": "integer",
+   "min": 18,
+   "max": 100,
+   "categories": [],
+   "editable": false
+  },
+  "sex": {
+   "label": "Sex (1 = male, 0 = female)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "cp": {
+   "label": "Chest pain type (1 typical angina, 2 atypical, 3 non-anginal, 4 asymptomatic)",
+   "unit": "",
+   "kind": "categorical",
+   "min": 1,
+   "max": 4,
+   "categories": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "editable": false
+  },
+  "trestbps": {
+   "label": "Resting systolic blood pressure",
+   "unit": "mmHg",
+   "kind": "continuous",
+   "min": 70,
+   "max": 250,
+   "categories": [],
+   "editable": true
+  },
+  "chol": {
+   "label": "Serum cholesterol",
+   "unit": "mg/dL",
+   "kind": "continuous",
+   "min": 100,
+   "max": 600,
+   "categories": [],
+   "editable": true
+  },
+  "fbs": {
+   "label": "Fasting blood sugar above 120 mg/dL (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "restecg": {
+   "label": "Resting ECG result (0 normal, 1 ST-T abnormality, 2 LV hypertrophy)",
+   "unit": "",
+   "kind": "categorical",
+   "min": 0,
+   "max": 2,
+   "categories": [
+    0,
+    1,
+    2
+   ],
+   "editable": false
+  },
+  "thalach": {
+   "label": "Maximum heart rate achieved in stress test",
+   "unit": "bpm",
+   "kind": "continuous",
+   "min": 60,
+   "max": 220,
+   "categories": [],
+   "editable": false
+  },
+  "exang": {
+   "label": "Exercise-induced angina (1 = yes)",
+   "unit": "",
+   "kind": "binary",
+   "min": 0,
+   "max": 1,
+   "categories": [],
+   "editable": false
+  },
+  "oldpeak": {
+   "label": "ST depression induced by exercise",
+   "unit": "mm",
+   "kind": "continuous",
+   "min": 0,
+   "max": 7,
+   "categories": [],
+   "editable": false
+  }
+ },
+ "note": "Experimental model estimate, not a diagnosis. Computed entirely on this device."
+}

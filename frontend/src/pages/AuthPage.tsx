@@ -62,7 +62,8 @@ export function AuthPage() {
           {formError && <p role="alert" className="rounded-xl bg-high-bg p-3 text-sm font-medium text-high">{formError}</p>}
           <Button type="submit" className="w-full" disabled={busy}>{busy ? t("auth.wait") : reg ? t("auth.create") : t("auth.signin")}</Button>
         </form>
-        <p className="mt-5 text-xs text-muted">{t("auth.footer")}</p>
+        <p className="mt-4 text-sm"><a href="/on-device" className="font-semibold text-brand underline">Try private mode: no account, runs on your device</a></p>
+        <p className="mt-3 text-xs text-muted">{t("auth.footer")}</p>
       </div>
     </main>
   );
