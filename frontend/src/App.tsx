@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { VirtualPatientPage } from "./pages/VirtualPatientPage";
 import { OnDevicePage } from "./pages/OnDevicePage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
@@ -49,6 +50,7 @@ export default function App() {
       <Routes>
         <Route path="/shared/:token" element={<SharedPage />} />
         <Route path="/on-device" element={<OnDevicePage />} />
+        <Route path="/virtual-patient" element={<VirtualPatientPage />} />
         <Route path="*" element={<AuthProvider><Gate /></AuthProvider>} />
       </Routes>
     </BrowserRouter></PrefsProvider>

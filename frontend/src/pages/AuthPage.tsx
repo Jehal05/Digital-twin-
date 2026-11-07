@@ -63,6 +63,7 @@ export function AuthPage() {
           <Button type="submit" className="w-full" disabled={busy}>{busy ? t("auth.wait") : reg ? t("auth.create") : t("auth.signin")}</Button>
         </form>
         <p className="mt-4 text-sm"><a href="/on-device" className="font-semibold text-brand underline">Try private mode: no account, runs on your device</a></p>
+        <p className="mt-1 text-sm"><a href="/virtual-patient" className="font-semibold text-brand underline">Watch a simulated patient</a></p>
         <p className="mt-3 text-xs text-muted">{t("auth.footer")}</p>
       </div>
     </main>

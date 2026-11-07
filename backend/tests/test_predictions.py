@@ -220,3 +220,15 @@ def test_twin_futures_follow_the_persons_own_measured_trend(user):
     b = user.post("/scenarios/futures", {"condition": "diabetes_survey", "baseline_prediction_id": p["id"]}).json()
     assert b["carry_on"]["scores"][-1] > b["carry_on"]["scores"][0]                         # worsening trend is carried forward
     assert any("trend" in a["assumption"] for a in b["carry_on"]["assumptions"])
+
+
+@pytest.mark.parametrize("path,body,cond", [
+    ("/predictions/diabetes-survey", {"features": SURVEY}, "diabetes_survey"),
+    ("/predictions/heart-disease", {"features": {"age": 58, "sex": 1, "cp": 4, "trestbps": 140, "chol": 240, "fbs": 0, "restecg": 0, "thalach": 130, "exang": 1, "oldpeak": 1.5}}, "heart_disease"),
+])
+def test_check_next_works_for_every_model_including_yes_no_and_category_inputs(user, path, body, cond):
+    p = user.post(path, body).json()
+    r = user.get(f"/predictions/{p['id']}/check-next")
+    assert r.status_code == 200, r.text
+    got = r.json()["inputs"]
+    assert {i["feature"] for i in got} == set(p["input_snapshot"]) and all(0 <= i["chance_band_changes"] <= 1 for i in got)

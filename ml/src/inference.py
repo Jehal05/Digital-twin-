@@ -160,11 +160,12 @@ class HealthTwinModel:
         band0 = self._band(p0)
         out = []
         for f in self.features:
-            grid = np.array(self.b["cohort_stats"][f]["percentile_grid"][1:100], dtype=float)
+            st = self.b["cohort_stats"][f]
             spec = self.schema[f]
-            if spec["kind"] in ("binary", "categorical"):
-                allowed = np.array(spec["categories"] or [0, 1], dtype=float)
-                grid = grid[np.isin(grid, allowed)] if np.isin(grid, allowed).any() else allowed
+            if "percentile_grid" in st:
+                grid = np.array(st["percentile_grid"][1:100], dtype=float)
+            else:                                   # yes/no and category inputs: each value, in proportion to how common it is in training
+                grid = np.concatenate([np.full(max(1, round(prop * 100)), float(k)) for k, prop in st["proportions"].items()])
             rows = pd.concat([X] * len(grid), ignore_index=True)
             rows[f] = grid
             pr = self.score_batch(rows)

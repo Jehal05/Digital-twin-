@@ -92,3 +92,17 @@ def test_date_and_type_filters(user):
     since = iso(NOW - timedelta(days=7))
     items = user.get("/measurements", params={"measurement_type": "steps", "from": since}).json()["items"]
     assert [m["value"] for m in items] == [900]
+
+
+def test_virtual_patient_anomaly_table_matches_the_server_rules():
+    """The browser simulator re-implements the jump rule; the thresholds and ranges must be the server's."""
+    import re
+    from pathlib import Path
+    from app.services.measurements import CATALOG
+    src = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "lib" / "simulation.ts").read_text()
+    jump = dict(re.findall(r"(\w+): ([\d.]+)", re.search(r"export const JUMP[^{]*\{(.*?)\};", src, re.S).group(1)))
+    rng = {k: (float(a), float(b)) for k, a, b in re.findall(r"(\w+): \[([\d.]+), ([\d.]+)\]", re.search(r"export const RANGE[^{]*\{(.*?)\};", src, re.S).group(1))}
+    assert jump and rng
+    for key, ratio in jump.items():
+        assert CATALOG[key].jump_ratio == float(ratio), key
+        assert (CATALOG[key].min, CATALOG[key].max) == rng[key], key
