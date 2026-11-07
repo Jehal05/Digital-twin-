@@ -22,12 +22,20 @@ export function RiskGauge({ p }: { p: Prediction }) {
   const reduce = useReducedMotion() ?? false;
   const value = p.score * 100;
   const t = p.trust;
+  const a = t?.applicability;
   return (
-    <Glass className="p-5" aria-labelledby="gauge-title">
+    <Glass className={`p-5 ${a && a.level !== "typical" ? "border-2 border-dashed border-moderate" : ""}`} aria-labelledby="gauge-title">
       <CardTitle aside={<div className="flex items-center gap-2"><ContentTag kind="ai_estimate" /><span className={`rounded-full px-3 py-0.5 text-xs font-semibold ${BAND_CHIP[p.risk_band]}`}>{BAND_LABEL[p.risk_band]}</span></div>}>
         <span id="gauge-title">{TITLE[p.condition]}</span>
       </CardTitle>
 
+      {a && a.level !== "typical" && (
+        <div role="note" data-testid="applicability-warning" className="mb-3 rounded-xl border border-moderate bg-moderate-bg text-ink p-3 text-sm">
+          <p className="font-semibold">{a.level === "outside" ? "This model may not be for you" : "Lower confidence: unusual inputs"}</p>
+          <p>{a.text}</p>
+          <ul className="mt-1 list-disc pl-5">{a.reasons.map((r) => <li key={r}>{r}</li>)}</ul>
+        </div>
+      )}
       <div className="flex flex-wrap items-end gap-x-3">
         <CountUp value={value} reduce={reduce} />
         <p className="pb-1 text-sm text-muted">model-estimated probability<br />{timeAgo(p.created_at)} · model v{p.model.version}</p>
@@ -57,6 +65,13 @@ export function RiskGauge({ p }: { p: Prediction }) {
             <dt className="text-xs text-muted">Two models agree</dt>
             <dd className="font-semibold"><span className="capitalize">{t.model_agreement.level}</span> <span className="num font-normal text-muted">({t.model_agreement.difference_pp.toFixed(0)} pts apart)</span></dd>
           </div>
+          {a && (
+            <div className="panel-dim col-span-2 p-3" data-testid="applicability">
+              <dt className="text-xs text-muted">Is this model for people like you?</dt>
+              <dd className="font-semibold">{a.level === "typical" ? "Yes, your inputs look typical" : a.level === "unusual" ? "Partly: your inputs are unusual" : "Probably not: your inputs are outside what it learned"}</dd>
+              <dd className="mt-0.5 text-xs text-muted">Closer to the middle than {Math.round((1 - a.distance_percentile) * 100)}% of training people. {a.limit}</dd>
+            </div>
+          )}
           {t.conformal && (
             <div className="panel-dim col-span-2 p-3" data-testid="conformal">
               <dt className="text-xs text-muted">{Math.round(t.conformal.coverage * 100)}% reliability check</dt>

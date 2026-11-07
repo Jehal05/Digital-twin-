@@ -11,6 +11,7 @@ import { ContentTag } from "../components/ui/ContentTag";
 import { CardTitle, Glass } from "../components/ui/Glass";
 import { EmptyState, ErrorState, Skeleton } from "../components/ui/States";
 import { Button } from "../components/ui/Button";
+import { CheckNext, Counterfactual } from "../components/dashboard/NextSteps";
 
 const PERCENTILE_FEATURES: Record<Condition, string[]> = { diabetes: ["glucose", "bmi", "blood_pressure", "age"], heart_disease: ["age", "trestbps", "chol", "thalach", "oldpeak"],
   diabetes_survey: ["bmi", "age_band", "physical_health_days", "mental_health_days"] };
@@ -85,6 +86,8 @@ export function RiskDetailPage() {
           <p className="mt-3 text-xs text-muted">{p.explanation?.reference ?? p.explanation?.note}</p>
           <p className="mt-2 text-xs text-muted">Method: {p.explanation?.method}. This describes how the model behaves; it does not show what causes disease.</p>
         </Glass>
+        <CheckNext p={p} />
+        <Counterfactual p={p} condition={condition} />
       </div>
     </div>
   );

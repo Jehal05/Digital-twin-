@@ -159,3 +159,40 @@ def test_extreme_low_risk_inputs_are_decided_and_borderline_inputs_are_not_hidde
     low = user.post("/predictions/diabetes-survey", {"features": {**SURVEY, "high_bp": 0, "high_chol": 0, "bmi": 20, "general_health": 1,
                     "difficulty_walking": 0, "physical_health_days": 0, "age_band": 2, "smoker": 0, "physical_activity": 1}}).json()
     assert low["trust"]["conformal"]["verdict"] in {"lower", "undecided"} and low["trust"]["conformal"]["verdict"] != "higher"
+
+
+def test_check_next_ranks_inputs_by_how_much_they_move_the_estimate(user, baseline):
+    r = user.get(f"/predictions/{baseline['id']}/check-next")
+    assert r.status_code == 200, r.text
+    b = r.json()
+    inputs = b["inputs"]
+    assert len(inputs) == 5 and [i["rank"] for i in inputs] == [1, 2, 3, 4, 5]
+    keys = [(-i["chance_band_changes"], -i["typical_swing_pp"]) for i in inputs]
+    assert keys == sorted(keys)
+    assert inputs[0]["feature"] in {"glucose", "age", "bmi"} and "not a diagnosis" in b["note"]
+
+
+def test_counterfactual_targets_the_next_lower_band_and_is_hypothetical(user):
+    hi = user.post("/predictions/diabetes-survey", {"features": SURVEY}).json()
+    r = user.post("/scenarios/counterfactual", {"condition": "diabetes_survey", "baseline_prediction_id": hi["id"]})
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert b["content_kind"] == "hypothetical" and b["baseline_score"] == hi["score"]
+    edge = b["band_edge"]
+    assert b["baseline_score"] >= edge
+    if b["feasible"]:
+        assert b["estimated_score"] < edge and b["scenario"]["scenario"]["score"] < edge and set(b["changes"]) <= {"bmi", "smoker", "physical_activity", "fruit_daily", "veg_daily", "heavy_alcohol"}
+
+
+def test_counterfactual_refuses_when_already_low(user):
+    lo = user.post("/predictions/diabetes-survey", {"features": {**SURVEY, "high_bp": 0, "high_chol": 0, "bmi": 20, "general_health": 1,
+                   "difficulty_walking": 0, "physical_health_days": 0, "age_band": 2, "smoker": 0}}).json()
+    if lo["score"] < 0.2:
+        assert user.post("/scenarios/counterfactual", {"condition": "diabetes_survey", "baseline_prediction_id": lo["id"]}).status_code == 422
+
+
+def test_applicability_flags_people_unlike_the_training_data(user):
+    typical = user.post("/predictions/diabetes", {"features": PROFILE}).json()["trust"]["applicability"]
+    assert typical["level"] == "typical" and typical["confidence_multiplier"] == 1.0
+    odd = user.post("/predictions/diabetes", {"features": {**PROFILE, "age": 80, "bmi": 60, "pregnancies": 0}}).json()["trust"]["applicability"]
+    assert odd["level"] in {"unusual", "outside"} and odd["reasons"] and odd["confidence_multiplier"] < 1

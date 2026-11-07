@@ -14,6 +14,7 @@ import shap
 
 from . import config as C
 from . import conformal as K
+from . import applicability as AP
 
 
 class InputValidationError(ValueError):
@@ -111,6 +112,9 @@ class HealthTwinModel:
             "uncertainty_range": rng,
             **extra,
             "out_of_distribution": ood,
+            **({"applicability": AP.assess(X.iloc[0], self.b["applicability"], {n: s["label"] for n, s in self.schema.items()},
+                                           {n: (st["min"], st["max"]) for n, st in self.b["cohort_stats"].items() if n in self.schema})}
+               if self.b.get("applicability") else {}),
         }
 
     def _explain(self, X: pd.DataFrame, top_k: int = 5) -> dict:
@@ -142,6 +146,40 @@ class HealthTwinModel:
     def score_batch(self, rows: pd.DataFrame) -> np.ndarray:
         """Score many already-validated rows at once with the real primary model (used by the Goal Planner)."""
         return self.b["models"][self.primary].predict_proba(rows[self.features])[:, 1]
+
+    def what_to_check_next(self, inputs: dict) -> dict:
+        """Which input's accuracy matters most for THIS person's estimate?
+
+        Every input is required, so none is "missing". Instead, each input in turn is replaced by values spread across the training
+        population (its 1st to 99th percentiles, equally weighted) while everything else stays as entered. If the estimate hardly moves,
+        a wrong or rough value for that input does not matter; if it swings or changes risk band, it is worth measuring carefully.
+        No measurement error is assumed or invented: this is a sensitivity, using the real model and the real spread of the data.
+        """
+        X = self.validate(inputs)
+        p0 = float(self.b["models"][self.primary].predict_proba(X)[0, 1])
+        band0 = self._band(p0)
+        out = []
+        for f in self.features:
+            grid = np.array(self.b["cohort_stats"][f]["percentile_grid"][1:100], dtype=float)
+            spec = self.schema[f]
+            if spec["kind"] in ("binary", "categorical"):
+                allowed = np.array(spec["categories"] or [0, 1], dtype=float)
+                grid = grid[np.isin(grid, allowed)] if np.isin(grid, allowed).any() else allowed
+            rows = pd.concat([X] * len(grid), ignore_index=True)
+            rows[f] = grid
+            pr = self.score_batch(rows)
+            bands = np.array([self._band(float(v)) for v in pr])
+            out.append({"feature": f, "label": spec["label"], "unit": spec["unit"], "value": float(X[f].iloc[0]),
+                        "typical_swing_pp": round(float(np.mean(np.abs(pr - p0))) * 100, 2),
+                        "range_pp": [round(float(np.percentile(pr, 5)) * 100, 1), round(float(np.percentile(pr, 95)) * 100, 1)],
+                        "chance_band_changes": round(float(np.mean(bands != band0)), 3)})
+        out.sort(key=lambda d: (-d["chance_band_changes"], -d["typical_swing_pp"]))
+        for i, d in enumerate(out):
+            d["rank"] = i + 1
+        return {"content_kind": "ai_estimate", "baseline_score": round(p0, 4), "baseline_band": band0, "inputs": out,
+                "method": "Sensitivity of the trained model to each input across the spread of the training population.",
+                "note": "Shows which entries matter most to this model's estimate, so you know where an accurate measurement is most valuable. "
+                        "It does not say what your true value is, and it is not medical advice. Experimental model estimate, not a diagnosis."}
 
     def editable_features(self) -> list[str]:
         return [n for n, s in self.schema.items() if s["editable"]]

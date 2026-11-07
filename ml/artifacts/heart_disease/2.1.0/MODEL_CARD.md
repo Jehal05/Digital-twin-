@@ -100,6 +100,6 @@ Mean Venn-Abers range width 0.028; mean logistic-vs-forest disagreement
 - Cholesterol recorded as 0 (172 patients) and a few resting blood-pressure zeros were treated as missing and imputed inside each training part.
 
 ## Reproducibility
-Trained 2026-11-07T10:05:30+00:00 with scikit-learn 1.9.1, numpy 2.5.3,
+Trained 2026-11-07T12:58:07+00:00 with scikit-learn 1.9.1, numpy 2.5.3,
 pandas 3.0.5, Python 3.13.18.
 Re-run: `python -m src.experiments heart` then `python -m src.finalize heart --version 2.1.0`.

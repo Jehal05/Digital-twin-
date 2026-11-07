@@ -31,6 +31,7 @@ from sklearn.model_selection import StratifiedKFold
 
 from . import advanced as A
 from . import conformal as K
+from . import applicability as AP
 from . import config as C
 from .data import load_brfss, load_pima, load_uci_heart_combined
 from .experiments import HEART_CATEGORICAL, REPORTS
@@ -152,7 +153,8 @@ def train_final(kind: str, version: str, raw_dir: Path = C.RAW_DIR, out_root: Pa
               "features": [vars(f) | {"categories": list(f.categories)} for f in cond.features]}
     stats = cohort_stats(X, cond.features)
     joblib.dump({"condition": cond.key, "version": version, "primary": primary, "features": features, "models": cal,
-                 "bootstrap": members, "conformal": conf, "venn_abers": va, "background": background, "operating_threshold": op_thr[primary], "schema": schema,
+                 "bootstrap": members, "conformal": conf, "venn_abers": va,
+                 "applicability": AP.fit(X, features, {f.name: f.kind for f in cond.features}), "background": background, "operating_threshold": op_thr[primary], "schema": schema,
                  "cohort_stats": stats}, out_dir / "model.joblib", compress=3)
 
     metrics = {

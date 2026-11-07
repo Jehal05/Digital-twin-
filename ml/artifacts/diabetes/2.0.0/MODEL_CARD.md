@@ -67,6 +67,6 @@ Mean Venn-Abers range width 0.027; mean logistic-vs-forest disagreement
 - Glucose, blood pressure, BMI and insulin recorded as 0 were treated as missing and imputed inside each training part.
 
 ## Reproducibility
-Trained 2026-11-07T10:08:31+00:00 with scikit-learn 1.9.1, numpy 2.5.3,
+Trained 2026-11-07T12:57:55+00:00 with scikit-learn 1.9.1, numpy 2.5.3,
 pandas 3.0.5, Python 3.13.18.
 Re-run: `python -m src.experiments pima` then `python -m src.finalize pima --version 2.0.0`.

@@ -10,7 +10,7 @@ from app.core.db import get_db
 from app.core.errors import ApiError
 from app.core.security import audit, current_user
 from app.models.tables import Prediction, SimulationScenario, User
-from app.schemas.api import GoalPlanIn, ScenarioIn
+from app.schemas.api import CounterfactualIn, GoalPlanIn, ScenarioIn
 from app.services import goal_planner
 from app.services.predictions import iso, prediction_out, run_and_store
 
@@ -89,6 +89,30 @@ def goal_plan(body: GoalPlanIn, request: Request, user: User = Depends(current_u
         return out
     sc = _save(db, request, user, reg, name=f"Goal: below {body.target_score:.0%}", kind="goal_plan", condition=body.condition,
                base=base, changes=result["changes"], target=body.target_score)
+    return {**out, "scenario": scenario_out(db, reg, sc)}
+
+
+@router.post("/counterfactual")
+def counterfactual(body: CounterfactualIn, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Smallest realistic change that moves the estimate into the next lower risk band (a hypothetical, not advice)."""
+    reg = request.app.state.registry
+    base = _baseline(db, user, reg, body.condition, body.baseline_prediction_id)
+    model = reg.get(body.condition)
+    lo, hi = model.b["schema"]["risk_band_edges"]
+    if base.score < lo:
+        raise ApiError(422, "validation_error", "The estimate is already in the lowest band.", {"baseline_prediction_id": "already low"})
+    edge = lo if base.score < hi else hi
+    target = round(edge - 0.001, 4)
+    result = goal_planner.plan(model, body.condition, base.input_snapshot, target, set(body.locked_inputs))
+    out = {"content_kind": "hypothetical", "condition": body.condition, "current_band": model._band(base.score),
+           "target_band": "low" if edge == lo else "moderate", "band_edge": edge, "target_score": target,
+           "baseline_score": base.score, **result}
+    if not result["feasible"] or not result["changes"]:
+        out["message"] = ("No realistic change to the inputs this app allows moves the estimate into the lower band. The closest result "
+                          "found is shown; nothing was saved.")
+        return out
+    sc = _save(db, request, user, reg, name=f"Lower band ({out['target_band']})", kind="goal_plan", condition=body.condition,
+               base=base, changes=result["changes"], target=target)
     return {**out, "scenario": scenario_out(db, reg, sc)}
 
 

@@ -12,6 +12,7 @@ export interface Trust {
   model_agreement: { logistic_regression: number; random_forest: number; difference_pp: number; level: "high" | "medium" | "low" };
   uncertainty_range: { low: number; high: number; method: string; note: string };
   conformal?: { outcome_set: number[]; verdict: "higher" | "lower" | "undecided" | "unusual"; coverage: number; text: string; guarantee: string };
+  applicability?: { level: "typical" | "unusual" | "outside"; distance_percentile: number; text: string; reasons: string[]; limit: string; confidence_multiplier: number };
   out_of_distribution: { feature: string; value: number; training_range: [number, number] }[];
 }
 export interface Prediction {

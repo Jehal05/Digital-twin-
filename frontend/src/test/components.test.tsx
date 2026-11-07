@@ -150,3 +150,17 @@ describe("friendly labels", () => {
     expect(screen.getByText("120")).toBeInTheDocument();
   });
 });
+
+describe("RiskGauge applicability warning", () => {
+  const a = (level: "typical" | "outside") => ({ ...prediction, trust: { ...prediction.trust!, applicability: { level, distance_percentile: 0.99, text: "Unlike training people.", reasons: ["Age (95) is outside the range seen in training (28 to 77)."], limit: "Detects inputs only.", confidence_multiplier: 0.25 } } });
+  it("warns, with reasons, when the person is unlike the training population", () => {
+    render(<RiskGauge p={a("outside")} />);
+    expect(screen.getByTestId("applicability-warning")).toHaveTextContent(/may not be for you/i);
+    expect(screen.getByTestId("applicability-warning")).toHaveTextContent(/Age \(95\)/);
+  });
+  it("shows no warning banner for typical inputs but still states applicability", () => {
+    render(<RiskGauge p={a("typical")} />);
+    expect(screen.queryByTestId("applicability-warning")).toBeNull();
+    expect(screen.getByTestId("applicability")).toBeInTheDocument();
+  });
+});

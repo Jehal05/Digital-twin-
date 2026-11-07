@@ -84,3 +84,14 @@ def trust(prediction_id: uuid.UUID, user: User = Depends(current_user), db: Sess
     row = _owned(db, user, prediction_id)
     return {"prediction_id": str(row.id), "trust": row.trust,
             "note": "Agreement and range describe model behaviour on this input, not certainty about your health."}
+
+
+@router.get("/{prediction_id}/check-next")
+def check_next(prediction_id: uuid.UUID, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """'What should I test next?': which entries move this estimate the most (see HealthTwinModel.what_to_check_next)."""
+    row = _owned(db, user, prediction_id)
+    if row.is_hypothetical:
+        raise ApiError(404, "not_found", "Prediction not found.")
+    condition = condition_of(db, row)
+    model = request.app.state.registry.get(condition)
+    return {"prediction_id": str(row.id), "condition": condition, **model.what_to_check_next(row.input_snapshot)}

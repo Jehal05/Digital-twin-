@@ -86,6 +86,12 @@ class GoalPlanIn(Strict):
     locked_inputs: list[str] = Field(default_factory=list, max_length=10)
 
 
+class CounterfactualIn(Strict):
+    condition: Literal["diabetes", "heart_disease", "diabetes_survey"]
+    baseline_prediction_id: uuid.UUID
+    locked_inputs: list[str] = Field(default_factory=list, max_length=10)
+
+
 class PreferencesIn(Strict):
     locale: Literal["en", "hi"] | None = None
     theme: Literal["light", "dark", "system"] | None = None
